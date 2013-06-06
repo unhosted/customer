@@ -1,24 +1,40 @@
 var mysql = require('mysql'),
   memcache = require('memcache'),
   email = require('../email').email,
+  domainconf = require('../domainconf').domainconf,
   config = require('../config').config;
 
-exports.createDomain = function(host, uid, admin, tech, ns) {
-  return sql('INSERT INTO `domain` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES'
-      +' (%s, %i, %s, %s, %s)', host, uid, admin, tech, ns).then(function() {
-    domainconf.set(host, admin, tech, ns);
+var DOMAIN = {
+  PENDING: 0,
+  ACTIVE: 1,
+  EXPIRED: 2
+};
+
+var connection = mysql.createConnection({
+  host     : config.db.host,
+  user     : config.db.user,
+  password : config.db.password,
+  database : config.db.database
+});
+
+connection.connect();
+
+exports.createDomain = function(host, uid, admin, tech, ns, cb) {
+  connection.query('INSERT INTO `domain` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES'
+      +' (?, ?, ?, ?, ?)', [host, uid, admin, tech, ns], function(err, data) {
+    domainconf.set(host, admin, tech, ns, cb);
   });
 };
-exports.updateDomain = function(host, uid, admin, tech, ns) {
-  return sql('UPDATE `domain`'
-        +' SET `uid` = %i, `admin` = %s `tech` = %s, `ns` = %s'
-        +' WHERE host = %s', uid, admin, tech, ns, host).then(function() {
-    domainconf.set(host, admin, tech, ns);
+exports.updateDomain = function(host, uid, admin, tech, ns, cb) {
+  connection.query('UPDATE `domain`'
+        +' SET `uid` = ?, `admin` = ?, `tech` = ?, `ns` =?'
+        +' WHERE host = ?', [uid, admin, tech, ns, host], function(err, data) {
+    domainconf.set(host, admin, tech, ns, cb);
   });
 };
-exports.expireDomain = function(host) {
-  return sql('UPDATE `domains` SET `status` = %i WHERE `host` = %s',
-      DOMAIN.EXPIRED, host).then(function() {
-    domainconf.set(host, null, null, null);
+exports.expireDomain = function(host, cb) {
+  connection.query('UPDATE `domains` SET `status` = ? WHERE `host` = ?',
+      [DOMAIN.EXPIRED, host], function(err, data) {
+    domainconf.set(host, null, null, null, cb);
   });
 };
