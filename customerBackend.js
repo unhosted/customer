@@ -122,7 +122,7 @@ exports.backend = {
         domainconf.set(host, null, null, null);
       });
     },
-  }
+  },
   remotestorage: {
     createAccount: function(uid, server, username, quota) {
       return sql('INSERT INTO `remotestorage` (`uid`, `server`, `username`, `quota`)'
