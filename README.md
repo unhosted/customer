@@ -2,7 +2,7 @@
 
 ## to install and run:
 
-    sudo apt-get install mysql-server memcached libcairo2-dev libfreetype6-dev
+    sudo apt-get install mysql-server memcached libcairo2-dev
     npm install
     # create a mysql database
     # import its tables from unht.sql
