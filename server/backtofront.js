@@ -74,7 +74,7 @@ if(typeof(window) != 'undefined') {//client
     ca: fs.readFileSync('./tls/ca.pem') 
   }, function(req, res) {
     res.writeHead(200);
-    res.end('connect a websocket please'); 
+    res.end(fs.readFileSync('../client/index.html')); 
   });
   httpsServer.listen(argv[2]);
   console.log('listening on port '+argv[3]);
