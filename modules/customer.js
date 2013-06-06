@@ -64,13 +64,11 @@ exports.verifyEmail = function(tokenUid, cb) {
       +' WHERE `status` = ? AND `token` = ? AND `uid` = ?',
       [USER.VERIFIED, USER.FRESH, parts[0], parts[1]], cb);
 };
-exports.startResetPassword = function(uid, cb) {
+exports.startResetPassword = function(emailAddress, cb) {
   var token = genToken();
   connection.query('UPDATE `customers` SET `status` = ?, `token` = ?'
-      +' WHERE `uid` = ?', [USER.RESETTING, token, uid], function(err, data) {
-    connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err, currentEmail) {
-      email.resetPassword(currentEmail, token+'_'+uid, cb);
-    });
+      +' WHERE `email_address` = ?', [USER.RESETTING, token, emailAddress], function(err, data) {
+    email.resetPassword(emailAddress, token+'_'+uid, cb);
   });
 };
 exports.startEmailChange = function(uid, newEmail, cb) {
