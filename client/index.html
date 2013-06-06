@@ -5,8 +5,8 @@
   </head>
   <body style="width:800px;margin:0px auto">
     <div id="first">
-      <p>On the server-side, run 'cd server/ ; node backtofront.js 1234 my_secret'.</p>
-      <p>Don't forget to accept the <a href="https://localhost:1234/">cert</a></p>
+      <p>On unht-beta.heahdk.net, run 'cd server/ ; node backtofront.js 1234 my_secret'.</p>
+      <p>Don't forget to accept the <a href="https://unht-beta.heahdk.net:1234/">cert</a></p>
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input placeholder="Your website or email"/></p>
         <p style="margin-left:30px"><input placeholder="Password"/><input type="submit" value="Sign in" /></p>
@@ -63,7 +63,7 @@
         alert(result);
       });
     }
-    backtofront.connect('wss://localhost:1234/sock/websocket', 'my_secret', function() {
+    backtofront.connect('wss://unht-beta.heahdk.net:1234/sock/websocket', 'my_secret', function() {
       genCaptcha();
     });
   </script>
