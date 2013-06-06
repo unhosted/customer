@@ -10,4 +10,5 @@ exports.email = {
   },
   resetPassword: function() {
     console.log('pretending to send resetPassword email...');
-  },
+  }
+};
