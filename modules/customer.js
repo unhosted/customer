@@ -1,5 +1,5 @@
 var mysql = require('mysql'),
-  memcache = require('memcache'),
+  Memcache = require('memcache'),
   email = require('../email').email,
   config = require('../config').config;
 
@@ -7,9 +7,13 @@ var connection = mysql.createConnection({
   host     : config.db.host,
   user     : config.db.user,
   password : config.db.password,
+  database : config.db.database
 });
 
 connection.connect();
+
+var memcache = new Memcache.Client(config.memcache.port, config.memcache.host);
+memcache.connect();
 
 connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
   if (err) throw err;
@@ -17,7 +21,7 @@ connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
   console.log('The solution is: ', rows[0].solution);
 });
 
-connection.end();
+//connection.end();
 
 //customers:
 // uid (int), email_address (str), new_email_address (str), password_hash (str), status (int), token (str)
@@ -38,53 +42,62 @@ var USER = {
   CLOSED: 5
 };
 
-exports.createUser = function(emailAddress, passwordHash) {
+function genToken() {
+  return 'asdf';
+}
+
+exports.createUser = function(emailAddress, passwordHash, cb) {
   var token = genToken();
-  return sql('INSERT INTO `customers` (`email_address`, `password_hash`, `token`, `status`) VALUES (%s, %s, %s)', emailAddress, passwordHash, token, USER.FRESH).then(function() {
-    var uid = sql.lastId();
-    email.verify(fields.email_address, token+'_'+uid);
-    return uid;
+  connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `token`, `status`) VALUES (?, ?, ?, ?)', [emailAddress, passwordHash, token, USER.FRESH], function(err, data) {
+    if(err) {
+      cb(err);
+    } else {
+      var uid = data.insertId;
+      email.verify(emailAddress, token+'_'+uid);
+      cb(err, uid);
+    }
   });
 };
-exports.verifyEmail = function(tokenUid) {
+exports.verifyEmail = function(tokenUid, cb) {
   var parts = tokenUid.split('_');
-  return sql('UPDATE `customers` SET `status`= %i'
-      +' WHERE `status` = %i AND `token` = %s AND `uid` = %i',
-      USER.VERIFIED, USER.FRESH, token, uid);
+  connection.query('UPDATE `customers` SET `status`= ?'
+      +' WHERE `status` = ? AND `token` = ? AND `uid` = ?',
+      [USER.VERIFIED, USER.FRESH, parts[0], parts[1]], cb);
 };
-exports.startResetPassword = function(uid) {
+exports.startResetPassword = function(uid, cb) {
   var token = genToken();
-  return sql('UPDATE `customers` SET `status` = %i, `token` = %s'
-      +' WHERE `uid` = %i', USER.RESETTING, token, uid).then(function() {
-    return sql('SELECT `email_address` from `customers` WHERE uid = %i', uid).then(function(currentEmail) {
-      return email.resetPassword(currentEmail, token);
+  connection.query('UPDATE `customers` SET `status` = ?, `token` = ?'
+      +' WHERE `uid` = ?', [USER.RESETTING, token, uid], function(err, data) {
+    connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err, currentEmail) {
+      email.resetPassword(currentEmail, token, cb);
     });
   });
 };
-exports.startEmailChange = function(uid, newEmail) {
+exports.startEmailChange = function(uid, newEmail, cb) {
   var token = genToken();
-  return sql('UPDATE `customers` SET `status` = %i, `new_email_address` = %s,'
-      +' `token` = %s WHERE `uid` = %i',
-      USER.CHANGING, newEmail, uid, token).then(function() {
-    return sql('SELECT `email_address` from `customers` WHERE uid = %i', uid).then(function(currentEmail) {
-      return email.changeTo(newEmail, token+'_'+uid).then(function() {
-        return email.changeFrom(currentEmail);
+  return sql('UPDATE `customers` SET `status` = ?, `new_email_address` = ?,'
+      +' `token` = ? WHERE `uid` = ?',
+      [USER.CHANGING, newEmail, uid, token], function(err1, data) {
+    connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err2, currentEmail) {
+      email.changeTo(newEmail, token+'_'+uid, function(err3) {
+        email.changeFrom(currentEmail, cb);
       });
     });
   });
 };
-exports.changePwd = function(emailAddress, newPasswordHash) {
-  return sql('UPDATE `customers` SET `password_hash` = %s'
-      +' WHERE `email_address` = %s', newPasswordHash, emailAddress).then(function() {
-    memcache.invalidate('pwd:'+emailAddress);
+exports.changePwd = function(emailAddress, newPasswordHash, cb) {
+  connection.query('UPDATE `customers` SET `password_hash` = ?'
+      +' WHERE `email_address` = ?', [newPasswordHash, emailAddress], function(err, data) {
+    memcache.delete('pwd:'+emailAddress);
+    cb();
   });
 };
-exports.checkEmailPwd = function(emailAddress, passwordHash) {
-  return memcache.get('pwd:'+emailAddress).then(function(val) {
+exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
+  memcache.get('pwd:'+emailAddress, function(err, val) {
     if(val) {
       return val==passwordHash;
     } else {
-      return sql('SELECT `uid`, `status` FROM `customers`'
+      connection.query('SELECT `uid`, `status` FROM `customers`'
       +' WHERE `email_address` = %s AND `password_hash` = %s',
       emailAddress, passwordHash).then(function(rows) {
         if(rows.length==1 && rows[0].status<=USER.MAXOPEN) {
@@ -95,9 +108,9 @@ exports.checkEmailPwd = function(emailAddress, passwordHash) {
     }
   });
 };
-exports.deleteUser = function(uid) {
+exports.deleteUser = function(uid, cb) {
   //todo: remove products
-  return sql('UPDATE `status` = %i WHERE `uid` = %i', USER.CLOSED, uid);
+  connection.query('UPDATE `status` = ? WHERE `uid` = ?', [USER.CLOSED, uid], cb);
 };
 /* dependencies to implement:
 https://npmjs.org/package/mysql

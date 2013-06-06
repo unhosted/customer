@@ -1,14 +1,18 @@
 exports.email = {
-  verify: function() {
+  verify: function(email, tokenUid, cb) {
     console.log('pretending to send verify email...');
+    cb();
   },
-  changeFrom: function() {
+  changeFrom: function(oldEmail, cb) {
     console.log('pretending to send changeFrom email...');
+    cb();
   },
-  changeTo: function() {
+  changeTo: function(newEmail, tokenUid, cb) {
     console.log('pretending to send changeTo email...');
+    cb();
   },
-  resetPassword: function() {
+  resetPassword: function(email, cb) {
     console.log('pretending to send resetPassword email...');
+    cb();
   }
 };

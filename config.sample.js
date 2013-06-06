@@ -4,5 +4,9 @@ exports.config = {
     user: 'root',
     password: 'something',
     database: 'customer'
+  },
+  memcache: {
+    port: 11211,
+    host: 'localhost'
   }
 };
