@@ -77,7 +77,7 @@ if(typeof(window) != 'undefined') {//client
     res.end('connect a websocket please'); 
   });
   httpsServer.listen(argv[2]);
-  console.log('listening on port '+argv[3]);
+  console.log('listening on port '+argv[2]);
 
   var sockServer = sockjs.createServer();
   sockServer.on('connection', function(conn) {
