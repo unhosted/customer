@@ -9,4 +9,5 @@ exports.config = {
     port: 11211,
     host: 'localhost'
   }
+  captchaSolutionSalt: 'salt n peppa'
 };

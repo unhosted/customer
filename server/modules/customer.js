@@ -1,7 +1,11 @@
+var captcha = require('../captcha');
+
 exports.requestCaptcha = function(cb) {
+  captcha.get(cb);
 };
 
-exports.requestAccount = function(email, hash, captcha, cb) {
+exports.requestAccount = function(email, hash, captchaToken, captchaSolution, cb) {
+  cb(captcha.resolve(captchaToken, captchaSolution));
 };
 
 exports.getSession = function(email, hash, cb) {
