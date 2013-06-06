@@ -6,6 +6,7 @@
     "memcache": "*",
     "captchagen": "*",
     "sockjs": "*",
-    "process": "*"
+    "process": "*",
+    "child_process": "*"
   }
 }
