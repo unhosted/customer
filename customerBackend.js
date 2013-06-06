@@ -1,6 +1,23 @@
 var mysql = require('mysql'),
   memcache = require('memcache'),
-  email = require('./email');
+  email = require('./email').email,
+  config = require('./config').config;
+
+var connection = mysql.createConnection({
+  host     : config.db.host,
+  user     : config.db.user,
+  password : config.db.password,
+});
+
+connection.connect();
+
+connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+  if (err) throw err;
+
+  console.log('The solution is: ', rows[0].solution);
+});
+
+connection.end();
 
 //customers:
 // uid (int), email_address (str), new_email_address (str), password_hash (str), status (int), token (str)
