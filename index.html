@@ -3,14 +3,67 @@
   <head>
     <meta charset="utf-8" />
   </head>
-  <body>
-    <p>On the server-side, run 'node backtofront.js 1234 my_secret'.</p>
-    <p>Don't forget to accept the <a href="https://localhost:1234/">cert</a></p>
-    <p>Open the console, and if it connects successfully you can execute the code example from
-<a href="https://github.com/simple-xmpp/node-simple-xmpp/#example">simple-xmpp</a> inside your browser (skip the first line).</p>
+  <body style="width:800px;margin:0px auto">
+    <div id="first">
+      <p>On the server-side, run 'cd server/ ; node backtofront.js 1234 my_secret'.</p>
+      <p>Don't forget to accept the <a href="https://localhost:1234/">cert</a></p>
+      <div style="background:grey;width:350px;float:right;margin-top:50px">
+        <p style="margin-left:30px"><input placeholder="Your website or email"/></p>
+        <p style="margin-left:30px"><input placeholder="Password"/><input type="submit" value="Sign in" /></p>
+        <p style="margin-left:30px"><input type="checkbox"/>Remember me | Forgot password?</p>
+      </div>
+      <p style="clear:right; float:left; width:300px"><strong>Welcome to the web.</strong> Connect with friends and the world around you.
+      </p>
+      <ul style="clear:left; float:left; width:300px">
+        <li>See photos and updates</li>
+        <li>Share what's new</li>
+        <li>Find more</li>
+      </ul>
+      <div style="background:grey; width:350px;float:right;clear:right;margin-top:50px">
+        <p style="margin-left:30px"><strong>New to the web?</strong> Sign up</p>
+        <p style="margin-left:30px"><input placeholder="Full name" id="fn" /></p>
+        <p style="margin-left:30px"><input placeholder="Email" id="email" /></p>
+        <p style="margin-left:30px"><input type="password" placeholder="Password" id="pwd" /></p>
+        <p style="margin-right:30px;float:right"><a href="more.html">learn more</a>
+             <input type="submit" value="Sign up for the web" onclick="step1();"/></p>
+      </div>
+    </div>
+    <div style="display:none" id="second">
+      <p><strong>Terms of Service:</strong></p>
+      <p><textarea>Be nice!</textarea></p>
+      <p><input type="checkbox">I agree with the Terms of Service</p>
+      <input type="submit" value="regen" onclick="genCaptcha();" />
+      <img id="captcha" />
+      <input id="solution" />
+      <input type="submit" value="register" onclick="register();" />
+    </div>
   </body>
   <script src="backtofront.js"></script>
   <script>
-    backtofront.connect('wss://localhost:1234/sock/websocket', 'my_secret');
+    function $(id) {
+      return document.getElementById(id);
+    }
+    function step1() {
+      localStorage.fullName = $('fn').value;
+      localStorage.email = $('email').value;
+      localStorage.pwd = $('pwd').value;
+      $('first').style.display='none';
+      $('second').style.display='block';
+    }
+    function genCaptcha() {
+      customer.requestCaptcha(function(uri, encrSolution, encrSalt) {
+        $('captcha').setAttribute('src', uri);
+        localStorage.encrSolution = encrSolution;
+        localStorage.encrSalt = encrSalt;
+      });
+    }
+    function register() {
+      customer.requestAccount(localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, function(result) {
+        alert(result);
+      });
+    }
+    backtofront.connect('wss://localhost:1234/sock/websocket', 'my_secret', function() {
+      genCaptcha();
+    });
   </script>
 </html>

@@ -1,6 +1,6 @@
 if(typeof(window) != 'undefined') {//client
   window.backtofront = {};
-  window.backtofront.connect = function(url, token) {
+  window.backtofront.connect = function(url, token, cb) {
     var sock = new WebSocket(url);
     sock.onopen = function() {
       console.log('open');
@@ -25,6 +25,9 @@ if(typeof(window) != 'undefined') {//client
               })(i, j);
             }
           }
+        }
+        if(typeof(cb)=='function') {
+          cb();
         }
       } else {
         if(running[obj.callback]) {
