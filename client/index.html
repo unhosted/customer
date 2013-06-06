@@ -29,9 +29,10 @@
       </div>
     </div>
     <div style="display:none" id="second">
+      <p><input placeholder="yourname" id="host" /><strong>.un.ht</strong></p>
       <p><strong>Terms of Service:</strong></p>
       <p><textarea>Be nice!</textarea></p>
-      <p><input type="checkbox">I agree with the Terms of Service</p>
+      <p><input type="checkbox" id="agree">I agree to the Terms of Service</p>
       <input type="submit" value="regen" onclick="genCaptcha();" />
       <img id="captcha" />
       <input id="solution" />
@@ -58,7 +59,7 @@
       });
     }
     function register() {
-      customer.requestAccount(localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, function(result) {
+      customer.requestAccount($('agree').checked, localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(result) {
         alert(result);
       });
     }

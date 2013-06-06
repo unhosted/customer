@@ -9,5 +9,6 @@ exports.config = {
     port: 11211,
     host: 'localhost'
   }
-  captchaSolutionSalt: 'salt n peppa'
+  captchaSolutionSalt: 'salt n peppa',
+  serverRoot: ['https://storage.example.com/']
 };

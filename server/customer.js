@@ -46,15 +46,16 @@ function genToken() {
   return 'asdf';
 }
 
-exports.createUser = function(emailAddress, passwordHash, cb) {
+exports.createAccount = function(emailAddress, passwordHash, cb) {
   var token = genToken();
   connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `token`, `status`) VALUES (?, ?, ?, ?)', [emailAddress, passwordHash, token, USER.FRESH], function(err, data) {
     if(err) {
       cb(err);
     } else {
       var uid = data.insertId;
-      email.verify(emailAddress, token+'_'+uid);
-      cb(err, uid);
+      email.verify(emailAddress, token+'_'+uid, function(err2) {
+        cb(err2, uid);
+      });
     }
   });
 };

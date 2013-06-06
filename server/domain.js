@@ -20,15 +20,14 @@ var connection = mysql.createConnection({
 connection.connect();
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
-  connection.query('INSERT INTO `domain` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES'
-      +' (?, ?, ?, ?, ?)', [host, uid, admin, tech, ns], function(err, data) {
+  connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
+      [host, uid, admin, tech, ns], function(err, data) {
     domainconf.set(host, admin, tech, ns, cb);
   });
 };
 exports.updateDomain = function(host, uid, admin, tech, ns, cb) {
-  connection.query('UPDATE `domain`'
-        +' SET `uid` = ?, `admin` = ?, `tech` = ?, `ns` =?'
-        +' WHERE host = ?', [uid, admin, tech, ns, host], function(err, data) {
+  connection.query('UPDATE `domains` SET `uid` = ?, `admin` = ?, `tech` = ?, `ns` =? WHERE host = ?',
+        [uid, admin, tech, ns, host], function(err, data) {
     domainconf.set(host, admin, tech, ns, cb);
   });
 };
