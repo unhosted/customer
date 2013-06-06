@@ -85,6 +85,7 @@ if(typeof(window) != 'undefined') {//client
 
   var sockServer = sockjs.createServer();
   sockServer.on('connection', function(conn) {
+    console.log('connection on sockServer');
     var methodNames = {};
     for(var i in modules) {
       methodNames[i]={};
@@ -92,12 +93,15 @@ if(typeof(window) != 'undefined') {//client
         methodNames[i][j]='default';
       }
     }
+    console.log('writing register');
     conn.write(JSON.stringify({
       type: 'register',
       modules: methodNames
     }));
     //FIXME: does this work with messages of >32Kb?
+    console.log('setting on data');
     conn.on('data', function(chunk) {
+      console.log(chunk);
       var obj, argList=[];
       try {
         obj = JSON.parse(chunk);
@@ -141,6 +145,7 @@ if(typeof(window) != 'undefined') {//client
         unparseable: chunk
       }));
     });
+    console.log('yep');
   });
   sockServer.installHandlers(httpsServer, {
     prefix: '/sock'
