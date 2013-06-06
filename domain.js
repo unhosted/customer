@@ -1,8 +1,8 @@
 var mysql = require('mysql'),
   memcache = require('memcache'),
-  email = require('../email').email,
-  domainconf = require('../domainconf').domainconf,
-  config = require('../config').config;
+  email = require('./email').email,
+  domainconf = require('./domainconf').domainconf,
+  config = require('./config').config;
 
 var DOMAIN = {
   PENDING: 0,

@@ -1,6 +1,6 @@
 var mysql = require('mysql'),
-  rsconf = require('../rsconf').rsconf,
-  config = require('../config').config;
+  rsconf = require('./rsconf').rsconf,
+  config = require('./config').config;
 
 var connection = mysql.createConnection({
   host     : config.db.host,

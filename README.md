@@ -11,7 +11,7 @@
 
 * changeEmail(uid, hash, newEmail, cb)
 * changePwd(uid, hash, newHash, cb)
-* deleteUser(uid, hash, cb)
+* deleteAccount(uid, hash, cb)
 * addThing(uid, hash, type, params, cb) -> thingId
 * updateThing(uid, hash, thingId, newParams, cb)
 * deleteThing(uid, hash, thingId, cb)
