@@ -69,13 +69,13 @@ exports.startResetPassword = function(uid, cb) {
   connection.query('UPDATE `customers` SET `status` = ?, `token` = ?'
       +' WHERE `uid` = ?', [USER.RESETTING, token, uid], function(err, data) {
     connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err, currentEmail) {
-      email.resetPassword(currentEmail, token, cb);
+      email.resetPassword(currentEmail, token+'_'+uid, cb);
     });
   });
 };
 exports.startEmailChange = function(uid, newEmail, cb) {
   var token = genToken();
-  return sql('UPDATE `customers` SET `status` = ?, `new_email_address` = ?,'
+  connection.query('UPDATE `customers` SET `status` = ?, `new_email_address` = ?,'
       +' `token` = ? WHERE `uid` = ?',
       [USER.CHANGING, newEmail, uid, token], function(err1, data) {
     connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err2, currentEmail) {
@@ -87,7 +87,7 @@ exports.startEmailChange = function(uid, newEmail, cb) {
 };
 exports.changePwd = function(emailAddress, newPasswordHash, cb) {
   connection.query('UPDATE `customers` SET `password_hash` = ?'
-      +' WHERE `email_address` = ?', [newPasswordHash, emailAddress], function(err, data) {
+      +' WHERE `email_address` = ?', [newPasswordHash, emailAddress], function(err, result) {
     memcache.delete('pwd:'+emailAddress);
     cb();
   });
@@ -98,19 +98,24 @@ exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
       return val==passwordHash;
     } else {
       connection.query('SELECT `uid`, `status` FROM `customers`'
-      +' WHERE `email_address` = %s AND `password_hash` = %s',
-      emailAddress, passwordHash).then(function(rows) {
-        if(rows.length==1 && rows[0].status<=USER.MAXOPEN) {
-          return memcache.set('pwd:'+emailAddress, rows[0].uid);
+          +' WHERE `email_address` = ? AND `password_hash` = ?',
+          [emailAddress, passwordHash], function(err, rows) {
+        console.log(err, rows);
+        if(err) {
+          cb(false);
+        } else {
+          if(rows.length==1 && rows[0].status<=USER.MAXOPEN) {
+            memcache.set('pwd:'+emailAddress, rows[0].uid);
+            cb(null, rows[0].uid);
+          }
         }
-        return false;
       });
     }
   });
 };
 exports.deleteUser = function(uid, cb) {
   //todo: remove products
-  connection.query('UPDATE `status` = ? WHERE `uid` = ?', [USER.CLOSED, uid], cb);
+  connection.query('UPDATE `customers` SET `status` = ? WHERE `uid` = ?', [USER.CLOSED, uid], cb);
 };
 /* dependencies to implement:
 https://npmjs.org/package/mysql

@@ -11,7 +11,7 @@ exports.email = {
     console.log('pretending to send changeTo email...');
     cb();
   },
-  resetPassword: function(email, cb) {
+  resetPassword: function(email, tokenUid, cb) {
     console.log('pretending to send resetPassword email...');
     cb();
   }
