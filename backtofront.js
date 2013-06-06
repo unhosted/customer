@@ -74,13 +74,18 @@ if(typeof(window) != 'undefined') {//client
     ca: fs.readFileSync('./tls/ca.pem') 
   }, function(req, res) {
     res.writeHead(200);
-    res.end('connect a websocket please'); 
+    if(req.url == '/backtofront.js') {
+      res.end(fs.readFileSync('../client/backtofront.js'));
+    } else { 
+      res.end(fs.readFileSync('../client/index.html')); 
+    }
   });
   httpsServer.listen(argv[2]);
-  console.log('listening on port '+argv[3]);
+  console.log('listening on port '+argv[2]);
 
   var sockServer = sockjs.createServer();
   sockServer.on('connection', function(conn) {
+    console.log('connection on sockServer');
     var methodNames = {};
     for(var i in modules) {
       methodNames[i]={};
@@ -88,12 +93,15 @@ if(typeof(window) != 'undefined') {//client
         methodNames[i][j]='default';
       }
     }
+    console.log('writing register');
     conn.write(JSON.stringify({
       type: 'register',
       modules: methodNames
     }));
     //FIXME: does this work with messages of >32Kb?
+    console.log('setting on data');
     conn.on('data', function(chunk) {
+      console.log(chunk);
       var obj, argList=[];
       try {
         obj = JSON.parse(chunk);
@@ -137,6 +145,7 @@ if(typeof(window) != 'undefined') {//client
         unparseable: chunk
       }));
     });
+    console.log('yep');
   });
   sockServer.installHandlers(httpsServer, {
     prefix: '/sock'
