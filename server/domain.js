@@ -26,7 +26,7 @@ function dnr(host, add, cb) {
     console.log('stdout: ' + data);
   });
 
-  dnr..stderr.on('data', function (data) {
+  dnr.stderr.on('data', function (data) {
     console.log('stderr: ' + data);
   });
 
