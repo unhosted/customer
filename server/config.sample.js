@@ -11,9 +11,5 @@ exports.config = {
   },
   captchaSolutionSalt: 'salt n peppa',
   serverRoot: ['https://storage.example.com/'],
-  deploy: {
-    dnr: '/usr/bin/adddnr',
-    zone: '/usr/bin/addzone',
-    rs: '/usr/bin/addremotestorage'
-  }
+  deploy: '/usr/bin/deploy.sh'
 };

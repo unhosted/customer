@@ -19,8 +19,8 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-function genNewKey(cb) {
-  var keygen = spawn(config.deploy.keygen, []),
+function deploy(host, cb) {
+  var keygen = spawn(config.deploy, [host]),
     str = '';
   dns.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
@@ -33,26 +33,6 @@ function genNewKey(cb) {
   });
 }
 
-function addZone(host, key, cb) {
-  var dns  = spawn(config.deploy.dns, [host, key]);
-  dns.stdout.on('data', function (data) { console.log('stdout: ' + data); });
-  dns.stderr.on('data', function (data) { console.log('stderr: ' + data); });
-  dns.on('close', function (code) {
-    console.log('child process exited with code ' + code);
-    cb(code);
-  });
-}
-
-function dnr(host, add, cb) {
-  var dnr  = spawn(config.deploy.dnr, [host]);
-  dnr.stdout.on('data', function (data) { console.log('stdout: ' + data); });
-  dnr.stderr.on('data', function (data) { console.log('stderr: ' + data); });
-  dnr.on('close', function (code) {
-    console.log('child process exited with code ' + code);
-    cb(code);
-  });
-}
-
 //* make list of reserved names
 //  - nic, root, www, example, unhosted,
 //  - anything implying authority or officialness
@@ -61,16 +41,12 @@ function dnr(host, add, cb) {
 
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
-  genNewKey(function(key) {
+  deploy(host, function(key) {
     connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
         [host, uid, admin, tech, ns], function(err, data) {
-      connection.query('INSERT INTO `zones` (`host`, `uid`, `key`) VALUES (?, ?, ?)', 
+      connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
           [host, uid, key], function(err2, data2) {
-        dns(host, key, function(err3) {
-          if(!err3) {
-            dnr(host, true, cb);
-          }
-        });
+        cb(key);
       });
     });
   });
