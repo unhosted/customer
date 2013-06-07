@@ -18,19 +18,8 @@ memcache.connect();
 connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
   if (err) throw err;
 
-  console.log('The solution is: ', rows[0].solution);
+  //console.log('The solution is: ', rows[0].solution);
 });
-
-//connection.end();
-
-//customers:
-// uid (int), email_address (str), new_email_address (str), password_hash (str), status (int), token (str)
-//
-//domains:
-//uid (int), host (str), admin (url), tech (url), ns (url)
-//
-//rs:
-//uid (int), server (str), username (str), quota (int)
 
 var USER = {
   FRESH: 0,
@@ -45,10 +34,17 @@ var USER = {
 function genToken() {
   return 'asdf';
 }
+function genSalt() {
+  return 'salty dogs';
+}
+function hashPwd(pwd, salt, alg) {
+  return 'deadbeef';
+}
 
 exports.createAccount = function(emailAddress, passwordHash, cb) {
-  var token = genToken();
-  connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `token`, `status`) VALUES (?, ?, ?, ?)', [emailAddress, passwordHash, token, USER.FRESH], function(err, data) {
+  var token = genToken(),
+    salt = genSalt();
+  var connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `salt`, `algorithm`, `token`, `status`) VALUES (?, ?, ?, ?)', [emailAddress, passwordHash, salt, 0, token, USER.FRESH], function(err, data) {
     if(err) {
       cb(err);
     } else {
@@ -84,28 +80,40 @@ exports.startEmailChange = function(uid, newEmail, cb) {
     });
   });
 };
-exports.changePwd = function(emailAddress, newPasswordHash, cb) {
-  connection.query('UPDATE `customers` SET `password_hash` = ?'
-      +' WHERE `email_address` = ?', [newPasswordHash, emailAddress], function(err, result) {
+exports.changePwd = function(emailAddress, newPassword, cb) {
+  var newSalt = genSalt();
+  var newPasswordHash = hashPwd(newPassword, newSalt, 0);
+  connection.query('UPDATE `customers` SET `password_hash` = ?, `salt` = ?, `algorithm` = ?',
+      +' WHERE `email_address` = ?', [newPasswordHash, newSalt, emailAddress], function(err, result) {
     memcache.delete('pwd:'+emailAddress);
     cb();
   });
 };
-exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
+exports.checkEmailPwd = function(emailAddress, password, cb) {
   memcache.get('pwd:'+emailAddress, function(err, val) {
     if(val) {
       return val==passwordHash;
     } else {
-      connection.query('SELECT `uid`, `status` FROM `customers`'
-          +' WHERE `email_address` = ? AND `password_hash` = ?',
-          [emailAddress, passwordHash], function(err, rows) {
+      connection.query('SELECT `uid`, `status`, `password_hash`, `salt`, `algorithm` FROM `customers`'
+          +' WHERE `email_address` = ?',
+          [emailAddress], function(err, rows) {
         console.log(err, rows);
         if(err) {
-          cb(false);
+          cb(err);
         } else {
-          if(rows.length==1 && rows[0].status<=USER.MAXOPEN) {
-            memcache.set('pwd:'+emailAddress, rows[0].uid);
-            cb(null, rows[0].uid);
+          if(rows.length==1) {
+            if(rows[0].status<=USER.MAXOPEN) {
+              memcache.set('pwd:'+emailAddress, JSON.stringify(rows[0]));
+              if(hashPwd(password, rows[0].salt, 0) == rows[0].password_hash) {
+                cb(null, rows[0].uid);
+              } else {
+                cb('email known but wrong pwd');
+              }
+            } else {
+              cb('user not open');
+            }
+          } else {
+            cb('email unknown');
           }
         }
       });

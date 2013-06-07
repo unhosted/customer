@@ -20,14 +20,14 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function deploy(host, cb) {
-  var keygen = spawn(config.deploy, [host]),
+  var script = spawn(config.deploy, [host]),
     str = '';
-  dns.stdout.on('data', function (data) {
+  script.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
     str += data;
   });
-  dns.stderr.on('data', function (data) { console.log('stderr: ' + data); });
-  dns.on('close', function (code) {
+  script.stderr.on('data', function (data) { console.log('stderr: ' + data); });
+  script.on('close', function (code) {
     console.log('child process exited with code ' + code);
     cb(str);
   });
