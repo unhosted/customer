@@ -23,12 +23,13 @@ DROP TABLE IF EXISTS `customers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `customers` (
-  `uid` int(11) DEFAULT NULL,
+  `uid` MEDIUMINT NOT NULL AUTO_INCREMENT,
   `email_address` varchar(255) DEFAULT NULL,
   `new_email_address` varchar(255) DEFAULT NULL,
   `password_hash` varchar(255) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
-  `token` varchar(255) DEFAULT NULL
+  `token` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -49,11 +50,12 @@ DROP TABLE IF EXISTS `domains`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `domains` (
-  `host` varchar(255) DEFAULT NULL,
-  `uid` int(11) DEFAULT NULL,
+  `host` varchar(255) NOT NULL,
+  `uid` MEDIUMINT NOT NULL,
   `admin` varchar(255) DEFAULT NULL,
   `tech` varchar(255) DEFAULT NULL,
-  `ns` varchar(255) DEFAULT NULL
+  `ns` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`host`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -67,6 +69,30 @@ LOCK TABLES `domains` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `zones`
+--
+
+DROP TABLE IF EXISTS `zones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `zones` (
+  `host` varchar(255) NOT NULL,
+  `uid` MEDIUMINT NOT NULL,
+  `editkey` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`host`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `zones`
+--
+
+LOCK TABLES `zones` WRITE;
+/*!40000 ALTER TABLE `zones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `zones` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `remotestorage`
 --
 
@@ -74,10 +100,11 @@ DROP TABLE IF EXISTS `remotestorage`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `remotestorage` (
-  `server` int(11) DEFAULT NULL,
-  `username` varchar(255) DEFAULT NULL,
-  `uid` int(11) DEFAULT NULL,
-  `quota` int(11) DEFAULT NULL
+  `server` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `uid` MEDIUMINT NOT NULL,
+  `quota` int(11) DEFAULT NULL,
+  PRIMARY KEY(`server`, `username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
