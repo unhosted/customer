@@ -41,6 +41,9 @@ function deploy(host, cb) {
 //  - pastefinger.un.ht
 //  - ...
 
+function genSessionToken() {
+  return '1234';
+}
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
   deploy(host, function(key) {
@@ -48,7 +51,11 @@ exports.createDomain = function(host, uid, admin, tech, ns, cb) {
         [host, uid, admin, tech, ns], function(err, data) {
       connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
           [host, uid, key], function(err2, data2) {
-        cb(key);
+        var sessionToken = genSessionToken();
+        connection.query('INSERT INTO `sessions` (`uid`, `token`) VALUES (?, ?)', 
+            [uid, sessionToken], function(err3, data3) {
+          cb(sessionToken);
+        });
       });
     });
   });
