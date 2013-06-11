@@ -1,6 +1,7 @@
 var mysql = require('mysql'),
   Memcache = require('memcache'),
   email = require('./email').email,
+  uuid = require('node-uuid'),
   config = require('./config').config;
 
 var connection = mysql.createConnection({
@@ -43,12 +44,14 @@ var USER = {
 };
 
 function genToken() {
-  return 'asdf';
+  return uuid();
 }
 
-exports.createAccount = function(emailAddress, passwordHash, cb) {
+exports.createAccount = function(emailAddress, password, cb) {
   var token = genToken();
-  connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `token`, `status`) VALUES (?, ?, ?, ?)', [emailAddress, passwordHash, token, USER.FRESH], function(err, data) {
+  var salt = uuid();
+  var hash = crypto.createHash('sha256').update(pwd).update(salt).digest('hex');
+  connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `password_salt`, `token`, `status`) VALUES (?, ?, ?, ?, ?)', [emailAddress, passwordHash, passwordSalt, token, USER.FRESH], function(err, data) {
     if(err) {
       cb(err);
     } else {
@@ -91,15 +94,15 @@ exports.changePwd = function(emailAddress, newPasswordHash, cb) {
     cb();
   });
 };
-exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
+exports.checkEmailPwd = function(emailAddress, password, cb) {
   memcache.get('pwd:'+emailAddress, function(err, val) {
     console.log('memcache', err, val);
     if(val && val.passwordHash == passwordHash) {
       cb(null, val.uid);
     } else {
-      connection.query('SELECT `uid`, `status` FROM `customers`'
-          +' WHERE `email_address` = ? AND `password_hash` = ?',
-          [emailAddress, passwordHash], function(err, rows) {
+      connection.query('SELECT `uid`, `status`, `password_hash`, `password_salt` FROM `customers`'
+          +' WHERE `email_address` = ?',
+          [emailAddress], function(err, rows) {
         console.log(err, rows);
         if(err) {
           cb(false);
@@ -107,9 +110,15 @@ exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
           if(rows.length>=1 && rows[0].status<=USER.MAXOPEN) {
             memcache.set('pwd:'+emailAddress, {
               passwordHash: rows[0].password_hash,
+              passwordSalt: rows[0].password_salt,
               uid: rows[0].uid
             });
-            cb(null, rows[0].uid);
+            var hash = crypto.createHash('sha256').update(password).update(rows[0].password_salt).digest('hex');
+            if(hash == rows[0].password_hash) {
+              cb(null, rows[0].uid);
+            } else {
+              cb('wrong email/pwd');
+            }
           } else {
             cb('first user not open');
           }

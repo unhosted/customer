@@ -1,6 +1,7 @@
 var mysql = require('mysql'),
   Memcache = require('memcache'),
   email = require('./email').email,
+  uuid = require('node-uuid'),
   config = require('./config').config;
 
 var connection = mysql.createConnection({
@@ -13,7 +14,7 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function genSessionToken() {
-  return '1234';
+  return uuid();
 }
 
 exports.create = function(uid, cb) {

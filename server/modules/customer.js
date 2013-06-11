@@ -9,10 +9,11 @@ exports.requestCaptcha = function(cb) {
   captcha.get(cb);
 };
 
-exports.requestAccount = function(agree, email, hash, captchaToken, captchaSolution, host, cb) {
+exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSolution, host, cb) {
   if(agree) {
-    if(captcha.resolve(captchaToken, captchaSolution)) {
-      customer.createAccount(email, hash, function(err, uid) {
+ 
+   if(captcha.resolve(captchaToken, captchaSolution)) {
+      customer.createAccount(email, pwd, function(err, uid) {
         if(err) {
           cb(err);
         } else {
@@ -37,9 +38,9 @@ exports.requestAccount = function(agree, email, hash, captchaToken, captchaSolut
   }
 };
 
-exports.getSession = function(email, hash, cb) {
-  console.log('getSession', email, hash);
-  customer.checkEmailPwd(email, hash, function(err, result) {
+exports.getSession = function(email, pwd, cb) {
+  console.log('getSession', email, pwd);
+  customer.checkEmailPwd(email, pwd, function(err, result) {
     console.log(err, result);
     if(result) {
       session.create(result, cb);

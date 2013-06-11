@@ -6,6 +6,8 @@
     "memcache": "*",
     "captchagen": "*",
     "sockjs": "*",
-    "process": "*"
+    "process": "*",
+    "crypto": "*",
+    "node-uuid": "*"
   }
 }
