@@ -29,7 +29,7 @@
     <div style="display:none" id="second">
       <p><input placeholder="yourname" id="host" /><strong>.un.ht</strong></p>
       <p><strong>Terms of Service:</strong></p>
-      <p><textarea readOnly=true>Be nice!</textarea></p>
+      <p><textarea id="tos" readOnly=true>Be nice!</textarea></p>
       <p><input type="checkbox" id="agree">I agree to the Terms of Service</p>
       <input type="submit" value="regen" onclick="genCaptcha();" />
       <img id="captcha" />
@@ -57,7 +57,7 @@
       });
     }
     function register() {
-      customer.requestAccount($('agree').checked, localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(err, result) {
+      customer.requestAccount(($('agree').checked?$('tos').innerHTML:''), localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(err, result) {
         if(err) {
           alert(err);
         } else {
