@@ -92,6 +92,26 @@ LOCK TABLES `zones` WRITE;
 /*!40000 ALTER TABLE `zones` ENABLE KEYS */;
 UNLOCK TABLES;
 
+DROP TABLE IF EXISTS `sites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sites` (
+  `host` varchar(255) NOT NULL,
+  `uid` MEDIUMINT NOT NULL,
+  `rsid` MEDIUMINT NOT NULL,
+  PRIMARY KEY (`host`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sites`
+--
+
+LOCK TABLES `sites` WRITE;
+/*!40000 ALTER TABLE `sites` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sites` ENABLE KEYS */;
+UNLOCK TABLES;
+
 --
 -- Table structure for table `remotestorage`
 --
@@ -100,11 +120,13 @@ DROP TABLE IF EXISTS `remotestorage`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `remotestorage` (
+  `id` MEDIUMINT NOT NULL AUTO_INCREMENT,
   `server` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `uid` MEDIUMINT NOT NULL,
   `quota` int(11) DEFAULT NULL,
-  PRIMARY KEY(`server`, `username`)
+  PRIMARY KEY(`id`),
+  UNIQUE INDEX(`server`, `username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -116,6 +138,28 @@ LOCK TABLES `remotestorage` WRITE;
 /*!40000 ALTER TABLE `remotestorage` DISABLE KEYS */;
 /*!40000 ALTER TABLE `remotestorage` ENABLE KEYS */;
 UNLOCK TABLES;
+
+DROP TABLE IF EXISTS `rstokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rstokens` (
+  `rsid` MEDIUMINT NOT NULL,
+  `origin` varchar(255) DEFAULT NULL,
+  `scope` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  PRIMARY KEY(`rsid`, `origin`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rstokens`
+--
+
+LOCK TABLES `rstokens` WRITE;
+/*!40000 ALTER TABLE `rstokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rstokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
