@@ -58,7 +58,7 @@
     }
     function register() {
       customer.requestAccount($('agree').checked, localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(result) {
-        window.location = '/cms.html?'+result;
+        window.location = '/cms.html#'+result;
       });
     }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
