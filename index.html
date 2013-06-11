@@ -6,8 +6,8 @@
   <body style="width:800px;margin:0px auto">
     <div id="first">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
-        <p style="margin-left:30px"><input placeholder="Your website or email"/></p>
-        <p style="margin-left:30px"><input placeholder="Password"/><input type="submit" value="Sign in" /></p>
+        <p style="margin-left:30px"><input id="email1" placeholder="Your website or email"/></p>
+        <p style="margin-left:30px"><input id="pwd1" placeholder="Password"/><input type="submit" value="Sign in" onclick="signIn();"/></p>
         <p style="margin-left:30px"><input type="checkbox"/>Remember me | Forgot password?</p>
       </div>
       <p style="clear:right; float:left; width:300px"><strong>Welcome to the web.</strong> Connect with friends and the world around you.
@@ -58,7 +58,12 @@
     }
     function register() {
       customer.requestAccount($('agree').checked, localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(result) {
-        window.location = '/cms.html#'+result;
+        window.location = 'https://control.5apps.com/cms.html#'+result;
+      });
+    }
+    function signIn() {
+      customer.getSession($('email1').value, $('pwd1').value, function(err, result) {
+        window.location = 'https://control.5apps.com/cms.html#'+result;
       });
     }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
