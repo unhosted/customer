@@ -93,8 +93,9 @@ exports.changePwd = function(emailAddress, newPasswordHash, cb) {
 };
 exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
   memcache.get('pwd:'+emailAddress, function(err, val) {
-    if(val) {
-      return val==passwordHash;
+    console.log('memcache', err, val);
+    if(val && val.passwordHash == passwordHash) {
+      cb(null, val.uid);
     } else {
       connection.query('SELECT `uid`, `status` FROM `customers`'
           +' WHERE `email_address` = ? AND `password_hash` = ?',
@@ -103,9 +104,14 @@ exports.checkEmailPwd = function(emailAddress, passwordHash, cb) {
         if(err) {
           cb(false);
         } else {
-          if(rows.length==1 && rows[0].status<=USER.MAXOPEN) {
-            memcache.set('pwd:'+emailAddress, rows[0].uid);
+          if(rows.length>=1 && rows[0].status<=USER.MAXOPEN) {
+            memcache.set('pwd:'+emailAddress, {
+              passwordHash: rows[0].password_hash,
+              uid: rows[0].uid
+            });
             cb(null, rows[0].uid);
+          } else {
+            cb('first user not open');
           }
         }
       });

@@ -1,6 +1,7 @@
 var captcha = require('../captcha'),
   customer = require('../customer'),
   domain = require('../domain'),
+  session = require('../session'),
   rs = require('../rs'),
   config = require('../config').config;
 
@@ -22,8 +23,8 @@ exports.requestAccount = function(agree, email, hash, captchaToken, captchaSolut
             } else {
               var root = config.serverRoot[serverId]+host+'/public/dns/whois/'+host+'.un.ht/';
               domain.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
-                cb(err3, uid);
-              });
+                session.create(uid, cb);
+             });
             }
           });
         }
@@ -37,6 +38,15 @@ exports.requestAccount = function(agree, email, hash, captchaToken, captchaSolut
 };
 
 exports.getSession = function(email, hash, cb) {
+  console.log('getSession', email, hash);
+  customer.checkEmailPwd(email, hash, function(err, result) {
+    console.log(err, result);
+    if(result) {
+      session.create(result, cb);
+    } else {
+      cb(err);
+    }
+  });
 };
 
 exports.resetPassword = function(email, captcha, cb) {
