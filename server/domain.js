@@ -37,7 +37,9 @@ function deploy(host, cb) {
 //  - nic, root, www, example, unhosted,
 //  - anything implying authority or officialness
 //  - anything <= 3 letters (at least <= 2 letters implies authority, like language/country codes),
-//  - http://tools.ietf.org/html/rfc6761 ...)
+//  - http://tools.ietf.org/html/rfc6761
+//  - pastefinger.un.ht
+//  - ...
 
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
