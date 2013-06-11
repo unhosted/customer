@@ -2,6 +2,7 @@ var mysql = require('mysql'),
   Memcache = require('memcache'),
   email = require('./email').email,
   uuid = require('node-uuid'),
+  crypto = require('crypto'),
   config = require('./config').config;
 
 var connection = mysql.createConnection({
@@ -49,8 +50,8 @@ function genToken() {
 
 exports.createAccount = function(emailAddress, password, cb) {
   var token = genToken();
-  var salt = uuid();
-  var hash = crypto.createHash('sha256').update(pwd).update(salt).digest('hex');
+  var passwordSalt = uuid();
+  var passwordHash = crypto.createHash('sha256').update(password).update(passwordSalt).digest('hex');
   connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `password_salt`, `token`, `status`) VALUES (?, ?, ?, ?, ?)', [emailAddress, passwordHash, passwordSalt, token, USER.FRESH], function(err, data) {
     if(err) {
       cb(err);
@@ -97,15 +98,20 @@ exports.changePwd = function(emailAddress, newPasswordHash, cb) {
 exports.checkEmailPwd = function(emailAddress, password, cb) {
   memcache.get('pwd:'+emailAddress, function(err, val) {
     console.log('memcache', err, val);
-    if(val && val.passwordHash == passwordHash) {
-      cb(null, val.uid);
+    if(val) {
+      var hash = crypto.createHash('sha256').update(password).update(val.passwordSalt).digest('hex');
+      if(val.passwordHash == hash) {        
+        cb(null, val.uid);
+      } else {
+        cb('wrong email/pwd (cached)');
+      }
     } else {
       connection.query('SELECT `uid`, `status`, `password_hash`, `password_salt` FROM `customers`'
           +' WHERE `email_address` = ?',
           [emailAddress], function(err, rows) {
         console.log(err, rows);
         if(err) {
-          cb(false);
+          cb('internal database error');
         } else {
           if(rows.length>=1 && rows[0].status<=USER.MAXOPEN) {
             memcache.set('pwd:'+emailAddress, {

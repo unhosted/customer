@@ -27,6 +27,7 @@ CREATE TABLE `customers` (
   `email_address` varchar(255) DEFAULT NULL,
   `new_email_address` varchar(255) DEFAULT NULL,
   `password_hash` varchar(255) DEFAULT NULL,
+  `password_salt` varchar(255) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`uid`)
