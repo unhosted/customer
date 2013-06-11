@@ -57,13 +57,21 @@
       });
     }
     function register() {
-      customer.requestAccount($('agree').checked, localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(result) {
-        window.location = 'https://control.5apps.com/cms.html#'+result;
+      customer.requestAccount($('agree').checked, localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(err, result) {
+        if(err) {
+          alert(err);
+        } else {
+          window.location = 'https://control.5apps.com/cms.html#'+result;
+        }
       });
     }
     function signIn() {
       customer.getSession($('email1').value, $('pwd1').value, function(err, result) {
-        window.location = 'https://control.5apps.com/cms.html#'+result;
+        if(err) {
+          alert(err);
+        } else {
+          window.location = 'https://control.5apps.com/cms.html#'+result;
+        }
       });
     }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
