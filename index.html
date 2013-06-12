@@ -7,7 +7,8 @@
     <div id="first">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="email1" placeholder="Your website or email"/></p>
-        <p style="margin-left:30px"><input id="pwd1" placeholder="Password"/><input type="submit" value="Sign in" onclick="signIn();"/></p>
+        <p style="margin-left:30px"><input id="pwd1" placeholder="Password" type="password" />
+            <input type="submit" value="Sign in" onclick="signIn();"/></p>
         <p style="margin-left:30px"><input type="checkbox"/>Remember me | Forgot password?</p>
       </div>
       <p style="clear:right; float:left; width:300px"><strong>Welcome to the web.</strong> Connect with friends and the world around you.
@@ -40,11 +41,13 @@
       <h1 id="welcome">Welcome to your unhosted customer account</h1>
       <p>
         <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
-        <input type="submit" value="Change" />
+        <input type="submit" value="Change" onclick="changeEmail();" />
       </p>
       <p>
-        <input type="submit" value="Change password" />
-        <input type="submit" value="Delete account" style="background:red" />
+        Current: <input id="currentPwd" type="password" />
+        New: <input id="newPwd" type="password" />
+        <input type="submit" value="Change password" onclick="changePwd();" />
+        <input type="submit" value="Delete account" style="background:red" onclick="deleteAccount();" />
       </p>
     </div>
   </body>
@@ -101,6 +104,21 @@
       $('second').style.display='none';
       $('settings').style.display='block';
     }
+    function changeEmail() {
+      customer.changeEmail(localStorage.sessionKey, $('currentPwd').value, $('settingsEmail').value, function(err) {
+        alert(err);
+      });
+    }
+    function changePwd() {
+      customer.changePassword(localStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
+        alert(err);
+      });
+    }
+    function deleteAccount() {
+      customer.deleteAccount(localStorage.sessionKey, function(err) {
+        alert(err);
+      });
+    } 
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
       genCaptcha();
       //fillSettings();
