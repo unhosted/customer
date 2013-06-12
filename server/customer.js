@@ -85,7 +85,9 @@ exports.verifyEmail = function(tokenUid, cb) {
   var parts = tokenUid.split('_');
   connection.query('UPDATE `customers` SET `status`= ?'
       +' WHERE `status` = ? AND `token` = ? AND `uid` = ?',
-      [USER.VERIFIED, USER.FRESH, parts[0], parts[1]], cb);
+      [USER.VERIFIED, USER.FRESH, parts[0], parts[1]], function(err) {
+    cb(err, parts[1]);
+  });
 };
 exports.startResetPassword = function(emailAddress, cb) {
   var token = genToken();
@@ -101,26 +103,25 @@ exports.startEmailChange = function(uid, newEmail, cb) {
       [USER.CHANGING, newEmail, token, uid], function(err1, data) {
     connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err2, currentEmail) {
       email.changeTo(newEmail, token+'_'+uid, function(err3) {
-        email.changeFrom(currentEmail, cb);
+        email.changeFrom(currentEmail[0].email_address, cb);
       });
     });
   });
 };
 exports.completeEmailChange = function(uid, cb) {
   var token = genToken();
-  console.log(USER.CHANGING, newEmail, uid, token);
   connection.query('UPDATE `customers` SET `status` = ?, `email_address` = `new_email_address`, `token` = NULL,'
       +'`new_email_address` = NULL WHERE `uid` = ?', [USER.VERIFIED, uid], cb);
 };
 exports.checkTokenUid = function(tokenUid, cb) {
   var parts = tokenUid.split('_');
-  connection.query('SELECT `uid` FROM `customers` WHERE `uid` = ? AND `token` = ?', [parts[0], parts[1]], function(err, data) {
+  connection.query('SELECT `uid` FROM `customers` WHERE `uid` = ? AND `token` = ?', [parts[1], parts[0]], function(err, rows) {
     if(err) {
       cb(err);
     } else if(!rows.length) {
-      cb('token not found');
+      cb('token not found '+parts[0]);
     } else {
-      cb(null, uid);
+      cb(null, rows[0].uid);
     }
   });
 };

@@ -23,12 +23,12 @@ exports.email = {
     sendTemplate(email, 'verify', {token: tokenUid}, cb);
   },
   changeFrom: function(oldEmail, cb) {
-    console.log('Sending changeFrom email to '+email);
-    sendTemplate(email, 'changeFrom', null, cb);
+    console.log('Sending changeFrom email to '+oldEmail);
+    sendTemplate(oldEmail, 'changeFrom', null, cb);
   },
   changeTo: function(newEmail, tokenUid, cb) {
-    console.log('Sending changeTo email to '+email);
-    sendTemplate(email, 'changeTo', {token: tokenUid}, cb);
+    console.log('Sending changeTo email to '+newEmail);
+    sendTemplate(newEmail, 'changeTo', {token: tokenUid}, cb);
   },
   resetPassword: function(email, tokenUid, cb) {
     console.log('Sending resetPassword email to '+email);

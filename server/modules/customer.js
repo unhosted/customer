@@ -118,19 +118,37 @@ exports.changeEmailConfirm = function(tokenUid, cb) {
     if(err) {
       cb(err);
     } else {
-      customer.completeEmailChange(uid, cb);
+      customer.completeEmailChange(uid, function(err) {
+        if(err) {
+          cb(err);
+        } else {
+          session.create(uid,cb);
+        }
+      });
     }
   });
-}
+};
 exports.verify = function(tokenUid, cb) {
-  customer.verifyEmail(tokenUid, cb);
-}
+  customer.verifyEmail(tokenUid, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+    	session.create(uid, cb);
+    }
+  });
+};
 exports.changePasswordConfirm = function(tokenUid, newPassword, cb) {
   customer.checkTokenUid(tokenUid, function(err, uid) {
     if(err) {
       cb(err);
     } else {
-      customer.changePassword(uid, newPassword, cb);
+      customer.changePassword(uid, newPassword, function(err) {
+        if(err) {
+          cb(err);
+        } else {
+          session.create(uid, cb);
+        }
+      });
     }
   });
 }
