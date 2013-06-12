@@ -90,10 +90,28 @@ exports.verifyEmail = function(tokenUid, cb) {
   });
 };
 exports.startResetPassword = function(emailAddress, cb) {
+  cb(null, 'maybe');//we don't tell the client if the attempt was successful, and send this immediately to avoid timing attacks
   var token = genToken();
-  connection.query('UPDATE `customers` SET `status` = ?, `token` = ?'
-      +' WHERE `email_address` = ?', [USER.RESETTING, token, emailAddress], function(err, data) {
-    email.resetPassword(emailAddress, token+'_'+uid, cb);
+  connection.query('SELECT `uid` FROM `customers`'
+      +' WHERE `email_address` = ?', [emailAddress], function(err, rows) {
+    if(err) {
+      console.log('err', err);
+    } else if(rows.length!=1) {
+      console.log('rows.length', rows.length);
+    } else {
+      connection.query('UPDATE `customers` SET `status` = ?, `token` = ?'
+          +' WHERE `uid` = ?', [USER.RESETTING, token, rows[0].uid], function(err2) {
+        if(err2) {
+          console.log('err2', err2);
+        } else {
+          email.resetPassword(emailAddress, token+'_'+rows[0].uid, function(err3) {
+            if(err3) {
+              console.log('err3', err3);
+            }
+          });
+        }
+      });
+    }
   });
 };
 exports.startEmailChange = function(uid, newEmail, cb) {
