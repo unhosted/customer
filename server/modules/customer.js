@@ -89,13 +89,20 @@ exports.resetPassword = function(email, captchaToken, captchaSolution, cb) {
 };
 
 function checkSP(sessionKey, password, cb) {
-  session.getUid(sessionKey, function(err, uid) {
-    if(err) {
-      cb(err);
-    } else {
-     customer.checkUidPwd(uid, password, cb);
-    }
-  });
+  if(typeof(sessionKey) != 'string' || !sessionKey.length) {
+    cb('no session key supplied');
+  } else if(typeof(password) != 'string' || !password.length) {
+    cb('no password supplied');
+  } else {
+    session.getUid(sessionKey, function(err, uid) {
+      if(err) {
+        cb(err);
+      } else {
+        console.log('uid for sessionKey ', sessionKey, uid);
+        customer.checkUidPwd(uid, password, cb);
+      }    
+    });
+  }
 }
 exports.changeEmail = function(sessionKey, password, newEmail, cb) {
   checkSP(sessionKey, password, function(err, uid) {

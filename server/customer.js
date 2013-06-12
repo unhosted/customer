@@ -207,7 +207,7 @@ exports.checkEmailPwd = function(emailAddress, password, cb) {
     }
   });
 };
-exports.deleteUser = function(uid, cb) {
+exports.deleteAccount = function(uid, cb) {
   //todo: remove products
   connection.query('UPDATE `customers` SET `status` = ? WHERE `uid` = ?', [USER.CLOSED, uid], cb);
 };
