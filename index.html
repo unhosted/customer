@@ -124,11 +124,12 @@
         var parts = location.hash.substring(1).split(':');
         location.hash = '';
         if(parts[0]=='verify') {
-          customer.verify(parts[1], function(err) {
+          customer.verify(parts[1], function(err, sessionKey) {
             if(err) {
               alert(err);
             } else {
-              alert('email address verified, thank you!');
+              showSession(sessionKey);
+              alert('email address verified, thank you!');              
             }
           });
         } else if(parts[0]=='reset_password') {
@@ -136,14 +137,17 @@
           $('first').style.display='none';
           $('second').style.display='none';
           $('resetPwd').style.display='block';
-        } else if(parts[0]=='change_email') {
-          customer.changeEmailConfirm(parts[1], function(err) {
+        } else if(parts[0]=='email_change') {
+          customer.changeEmailConfirm(parts[1], function(err, sessionKey) {
             if(err) {
               alert(err);
             } else {
+              showSession(sessionKey);
               alert('email address changed!');
             }
           });
+        } else {
+          alert('ignoring hash '+JSON.stringify(parts));
         }
       }
       genCaptcha();
