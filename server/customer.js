@@ -96,7 +96,12 @@ exports.changePwd = function(emailAddress, newPasswordHash, cb) {
   });
 };
 exports.checkEmailPwd = function(emailAddress, password, cb) {
-  memcache.get('pwd:'+emailAddress, function(err, val) {
+  memcache.get('pwd:'+emailAddress, function(err, valStr) {
+    var val;
+    try {
+      val = JSON.parse(valStr);
+    } catch(e) {
+    }
     console.log('memcache', err, val);
     if(val) {
       var hash = crypto.createHash('sha256').update(password).update(val.passwordSalt).digest('hex');
@@ -114,11 +119,11 @@ exports.checkEmailPwd = function(emailAddress, password, cb) {
           cb('internal database error');
         } else {
           if(rows.length>=1 && rows[0].status<=USER.MAXOPEN) {
-            memcache.set('pwd:'+emailAddress, {
+            memcache.set('pwd:'+emailAddress, JSON.stringify({
               passwordHash: rows[0].password_hash,
               passwordSalt: rows[0].password_salt,
               uid: rows[0].uid
-            });
+            }));
             var hash = crypto.createHash('sha256').update(password).update(rows[0].password_salt).digest('hex');
             if(hash == rows[0].password_hash) {
               cb(null, rows[0].uid);

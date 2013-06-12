@@ -36,6 +36,17 @@
       <input id="solution" />
       <input type="submit" value="register" onclick="register();" />
     </div>
+    <div style="display:none" id="settings">
+      <h1 id="welcome">Welcome to your unhosted customer account</h1>
+      <p>
+        <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
+        <input type="submit" value="Change" />
+      </p>
+      <p>
+        <input type="submit" value="Change password" />
+        <input type="submit" value="Delete account" style="background:red" />
+      </p>
+    </div>
   </body>
   <script src="backtofront.js"></script>
   <script>
@@ -61,7 +72,7 @@
         if(err) {
           alert(err);
         } else {
-          window.location = 'https://control.5apps.com/cms.html#'+result;
+          showSettings(result);
         }
       });
     }
@@ -70,12 +81,29 @@
         if(err) {
           alert(err);
         } else {
-          window.location = 'https://control.5apps.com/cms.html#'+result;
+          showSettings(result);
         }
       });
     }
+    function showSettings(sessionKey) {
+      customer.getSettings(sessionKey, function(err, obj) {
+        if(err) {
+          alert(err);
+        } else {
+          $('settingsEmail').value = obj.email;
+          if(obj.emailValidated) {
+            $('validateEmail').style.display='none';
+          }
+        }
+      });
+      localStorage.sessionKey = sessionKey;
+      $('first').style.display='none';
+      $('second').style.display='none';
+      $('settings').style.display='block';
+    }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
       genCaptcha();
+      //fillSettings();
     });
   </script>
 </html>
