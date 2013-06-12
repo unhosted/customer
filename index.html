@@ -9,7 +9,7 @@
         <p style="margin-left:30px"><input id="email1" placeholder="Your website or email"/></p>
         <p style="margin-left:30px"><input id="pwd1" placeholder="Password" type="password" />
             <input type="submit" value="Sign in" onclick="signIn();"/></p>
-        <p style="margin-left:30px"><input type="checkbox"/>Remember me | Forgot password?</p>
+        <p style="margin-left:30px"><input type="checkbox"/>Remember me | <a onclick="forgot();">Forgot password?</a></p>
       </div>
       <p style="clear:right; float:left; width:300px"><strong>Welcome to the web.</strong> Connect with friends and the world around you.
       </p>
@@ -25,6 +25,15 @@
         <p style="margin-left:30px"><input type="password" placeholder="Password" id="pwd" /></p>
         <p style="margin-right:30px;float:right"><a href="more.html">learn more</a>
              <input type="submit" value="Sign up for the web" onclick="step1();"/></p>
+      </div>
+    </div>
+    <div style="display:none" id="forgot">
+      <div style="background:grey;width:350px;float:right;margin-top:50px">
+        <p style="margin-left:30px"><input id="email_forgot" placeholder="Your website or email"/></p>
+        <p style="margin-left:30px"><input type="submit" value="regen" onclick="genCaptcha();" />
+            <img id="captcha_forgot" />
+            <input id="solution_forgot" />
+            <input type="submit" value="Send reminder" onclick="sendReminder();"/></p>
       </div>
     </div>
     <div style="display:none" id="second">
@@ -56,6 +65,16 @@
     function $(id) {
       return document.getElementById(id);
     }
+    function forgot() {
+      $('first').style.display='none';
+      $('forgot').style.display='block';
+    }
+    function sendReminder() {
+      customer.resetPassword($('email_forgot').value, localStorage.encrSolution, $('solution_forgot').value, function(err, data) {
+        alert(err);
+        alert(data);
+      });
+    }
     function step1() {
       localStorage.fullName = $('fn').value;
       localStorage.email = $('email').value;
@@ -66,6 +85,7 @@
     function genCaptcha() {
       customer.requestCaptcha(function(uri, encrSolution, encrSalt) {
         $('captcha').setAttribute('src', uri);
+        $('captcha_forgot').setAttribute('src', uri);
         localStorage.encrSolution = encrSolution;
         localStorage.encrSalt = encrSalt;
       });
