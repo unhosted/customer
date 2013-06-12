@@ -113,7 +113,27 @@ exports.changeEmail = function(sessionKey, password, newEmail, cb) {
     }
   });
 };
-
+exports.changeEmailConfirm = function(tokenUid, cb) {
+  customer.checkTokenUid(tokenUid, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      customer.completeEmailChange(uid, cb);
+    }
+  });
+}
+exports.verify = function(tokenUid, cb) {
+  customer.verifyEmail(tokenUid, cb);
+}
+exports.changePasswordConfirm = function(tokenUid, newPassword, cb) {
+  customer.checkTokenUid(tokenUid, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      customer.changePassword(uid, newPassword, cb);
+    }
+  });
+}
 exports.changePassword = function(sessionKey, password, newPassword, cb) {
   console.log('changePassword', sessionKey, password, newPassword, typeof(cb));
   checkSP(sessionKey, password, function(err, uid) {

@@ -120,6 +120,32 @@
       });
     } 
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
+      if(location.hash.length) {
+        var parts = location.hash.substring(1).split(':');
+        location.hash = '';
+        if(parts[0]=='verify') {
+          customer.verify(parts[1], function(err) {
+            if(err) {
+              alert(err);
+            } else {
+              alert('email address verified, thank you!');
+            }
+          });
+        } else if(parts[0]=='reset_password') {
+          localStorage.resetPwd = parts[1];
+          $('first').style.display='none';
+          $('second').style.display='none';
+          $('resetPwd').style.display='block';
+        } else if(parts[0]=='change_email') {
+          customer.changeEmailConfirm(parts[1], function(err) {
+            if(err) {
+              alert(err);
+            } else {
+              alert('email address changed!');
+            }
+          });
+        }
+      }
       genCaptcha();
       //fillSettings();
     });

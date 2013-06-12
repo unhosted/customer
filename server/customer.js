@@ -106,6 +106,24 @@ exports.startEmailChange = function(uid, newEmail, cb) {
     });
   });
 };
+exports.completeEmailChange = function(uid, cb) {
+  var token = genToken();
+  console.log(USER.CHANGING, newEmail, uid, token);
+  connection.query('UPDATE `customers` SET `status` = ?, `email_address` = `new_email_address`, `token` = NULL,'
+      +'`new_email_address` = NULL WHERE `uid` = ?', [USER.VERIFIED, uid], cb);
+};
+exports.checkTokenUid = function(tokenUid, cb) {
+  var parts = tokenUid.split('_');
+  connection.query('SELECT `uid` FROM `customers` WHERE `uid` = ? AND `token` = ?', [parts[0], parts[1]], function(err, data) {
+    if(err) {
+      cb(err);
+    } else if(!rows.length) {
+      cb('token not found');
+    } else {
+      cb(null, uid);
+    }
+  });
+};
 exports.changePassword = function(uid, newPassword, cb) {
   var passwordSalt = uuid();
   var passwordHash = crypto.createHash('sha256').update(newPassword).update(passwordSalt).digest('hex');
