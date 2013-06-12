@@ -96,9 +96,9 @@ exports.startResetPassword = function(emailAddress, cb) {
 };
 exports.startEmailChange = function(uid, newEmail, cb) {
   var token = genToken();
-  connection.query('UPDATE `customers` SET `status` = ?, `new_email_address` = ?,'
-      +' `token` = ? WHERE `uid` = ?',
-      [USER.CHANGING, newEmail, uid, token], function(err1, data) {
+  console.log(USER.CHANGING, newEmail, uid, token);
+  connection.query('UPDATE `customers` SET `status` = ?, `new_email_address` = ?, `token` = ? WHERE `uid` = ?',
+      [USER.CHANGING, newEmail, token, uid], function(err1, data) {
     connection.query('SELECT `email_address` from `customers` WHERE uid = ?', [uid], function(err2, currentEmail) {
       email.changeTo(newEmail, token+'_'+uid, function(err3) {
         email.changeFrom(currentEmail, cb);
