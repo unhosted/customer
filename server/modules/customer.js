@@ -71,9 +71,12 @@ exports.getSession = function(email, pwd, cb) {
   });
 };
 exports.getSettings = function(sessionKey, cb) {
-  cb(null, {
-    email: 'your@email.com',
-    emailValidated: false
+  session.getUid(sessionKey, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      customer.getEmail(uid, cb);
+    }
   });
 };
 

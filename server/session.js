@@ -23,4 +23,18 @@ exports.create = function(uid, cb) {
       [uid, sessionToken], function(err4) {
     cb(null, sessionToken);
   });
-}
+};
+
+exports.getUid = function(sessionKey, cb) {
+  console.log('looking up uid for sessionKey', sessionKey);
+  connection.query('SELECT `uid` FROM `sessions` WHERE `token` = ?', [sessionKey], function(err, rows) {
+    if(err) {
+      cb(err);
+    } else if(rows.length != 1) {
+      cb('session not found for key');
+    } else {
+      cb(err, rows[0].uid);
+    }
+  });
+};
+    

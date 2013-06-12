@@ -36,6 +36,7 @@ connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
 
 var USER = {
   FRESH: 0,
+  MINVERIFIED: 1, //all states up from here are 'verified', the ones below will show a prompt to verify your email address
   VERIFIED: 1,
   CHANGING: 2,
   RESETTING: 3,
@@ -46,6 +47,23 @@ var USER = {
 
 function genToken() {
   return uuid();
+}
+
+exports.getEmail = function(uid, cb) {
+  console.log('looking up email for uid', uid);
+  connection.query('SELECT `email_address`, `status` FROM `customers` WHERE `uid` = ? AND `status` <= ?',
+      [uid, USER.MAXOPEN], function(err, rows) {
+    if(err) {
+      cb(err);
+    } else if(rows.length != 1) {
+      cb('invalid user');
+    } else {
+      cb(null, {
+        email: rows[0].email_address,
+        emailValidated: (rows[0].status>=USER.MINVERIFIED)
+      });
+    }
+  });
 }
 
 exports.createAccount = function(emailAddress, password, cb) {
