@@ -115,7 +115,7 @@
       });
     }
     function deleteAccount() {
-      customer.deleteAccount(localStorage.sessionKey, function(err) {
+      customer.deleteAccount(localStorage.sessionKey, $('currentPwd').value, function(err) {
         alert(err);
       });
     } 
