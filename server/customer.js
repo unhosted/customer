@@ -106,11 +106,62 @@ exports.startEmailChange = function(uid, newEmail, cb) {
     });
   });
 };
-exports.changePwd = function(emailAddress, newPasswordHash, cb) {
-  connection.query('UPDATE `customers` SET `password_hash` = ?'
-      +' WHERE `email_address` = ?', [newPasswordHash, emailAddress], function(err, result) {
-    memcache.delete('pwd:'+emailAddress);
-    cb();
+exports.changePassword = function(uid, newPassword, cb) {
+  var passwordSalt = uuid();
+  var passwordHash = crypto.createHash('sha256').update(newPassword).update(passwordSalt).digest('hex');
+  connection.query('UPDATE `customers` SET `password_hash` = ?, `password_salt` = ?'
+      +' WHERE `uid` = ?', [passwordHash, passwordSalt, uid], function(err, result) {
+    memcache.delete('pwd-u:'+uid);
+    exports.getEmail(uid, function(err, data) {
+      if(err) {
+        console.log(err);
+      } else {
+        memcache.delete('pwd:'+data.email);
+      }
+      cb();
+    });
+  });
+};
+exports.checkUidPwd = function(uid, password, cb) {
+  memcache.get('pwd-u:'+uid, function(err, valStr) {
+    var val;
+    try {
+      val = JSON.parse(valStr);
+    } catch(e) {
+    }
+    console.log('memcache', err, val);
+    if(val) {
+      var hash = crypto.createHash('sha256').update(password).update(val.passwordSalt).digest('hex');
+      if(val.passwordHash == hash) {        
+        cb(null, uid);
+      } else {
+        cb('wrong email/pwd (cached)');
+      }
+    } else {
+      connection.query('SELECT `status`, `password_hash`, `password_salt` FROM `customers`'
+          +' WHERE `uid` = ?',
+          [uid], function(err, rows) {
+        console.log(err, rows);
+        if(err) {
+          cb('internal database error');
+        } else {
+          if(rows.length>=1 && rows[0].status<=USER.MAXOPEN) {
+            memcache.set('pwd-u:'+uid, JSON.stringify({
+              passwordHash: rows[0].password_hash,
+              passwordSalt: rows[0].password_salt
+            }));
+            var hash = crypto.createHash('sha256').update(password).update(rows[0].password_salt).digest('hex');
+            if(hash == rows[0].password_hash) {
+              cb(null, uid);
+            } else {
+              cb('wrong user/pwd');
+            }
+          } else {
+            cb('first user not open');
+          }
+        }
+      });
+    }
   });
 };
 exports.checkEmailPwd = function(emailAddress, password, cb) {

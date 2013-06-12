@@ -80,16 +80,52 @@ exports.getSettings = function(sessionKey, cb) {
   });
 };
 
-exports.resetPassword = function(email, captcha, cb) {
+exports.resetPassword = function(email, captchaToken, captchaSolution, cb) {
+  if(captcha.resolve(captchaToken, captchaSolution)) {
+    customer.startResetPassword(email, cb);
+  } else {
+    cb('captcha wrong!');
+  }
 };
 
-exports.changeEmail = function(uid, hash, newEmail, cb) {
+function checkSP(sessionKey, password, cb) {
+  session.getUid(sessionKey, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+     customer.checkUidPwd(uid, password, cb);
+    }
+  });
+}
+exports.changeEmail = function(sessionKey, password, newEmail, cb) {
+  checkSP(sessionKey, password, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      customer.startEmailChange(uid, newEmail, cb);
+    }
+  });
 };
 
-exports.changePwd = function(uid, hash, newHash, cb) {
+exports.changePassword = function(sessionKey, password, newPassword, cb) {
+  console.log('changePassword', sessionKey, password, newPassword, typeof(cb));
+  checkSP(sessionKey, password, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      customer.changePassword(uid, newPassword, cb);
+    }
+  });
 };
 
-exports.deleteAccount = function(uid, hash, cb) {
+exports.deleteAccount = function(sessionKey, password, cb) {
+  checkSP(sessionKey, password, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      customer.deleteAccount(uid, cb);
+    }
+  });
 };
 
 exports.addThing = function(uid, hash, type, params, cb) {
