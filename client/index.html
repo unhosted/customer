@@ -5,9 +5,9 @@
   </head>
   <body style="width:800px;margin:0px auto">
     <div id="first">
-      <div style="background:grey;width:350px;float:right;margin-top:50px">
-        <p style="margin-left:30px"><input id="email1" placeholder="Your website or email"/></p>
-        <p style="margin-left:30px"><input id="pwd1" placeholder="Password" type="password" />
+      <div style="background:grey;width:650px;float:right;margin-top:50px">
+        <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
+            <input id="pwd1" placeholder="Password" type="password" />
             <input type="submit" value="Sign in" onclick="signIn();"/></p>
         <p style="margin-left:30px"><input type="checkbox"/>Remember me | <a onclick="forgot();">Forgot password?</a></p>
       </div>
@@ -36,6 +36,12 @@
             <input type="submit" value="Send reminder" onclick="sendReminder();"/></p>
       </div>
     </div>
+    <div style="display:none" id="resetPwd">
+      <div style="background:grey;width:350px;float:right;margin-top:50px">
+        <p style="margin-left:30px"><input id="password_reset" type="password" placeholder="New password"/></p>
+        <p style="margin-left:30px"><input type="submit" value="Reset password" onclick="resetPwd();"/></p>
+      </div>
+    </div>
     <div style="display:none" id="second">
       <p><input placeholder="yourname" id="host" /><strong>.un.ht</strong></p>
       <p><strong>Terms of Service:</strong></p>
@@ -47,7 +53,7 @@
       <input type="submit" value="register" onclick="register();" />
     </div>
     <div style="display:none" id="settings">
-      <h1 id="welcome">Welcome to your unhosted customer account</h1>
+      <h1 id="welcome">Welcome to your unhosted customer account <input type="submit" value="logout" onclick="logout();" /></h1>
       <p>
         <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
         <input type="submit" value="Change" onclick="changeEmail();" />
@@ -104,6 +110,9 @@
         if(err) {
           alert(err);
         } else {
+          if($('remember').checked) {
+            localStorage.sessionKey = result;
+          }
           showSettings(result);
         }
       });
@@ -119,28 +128,45 @@
           }
         }
       });
-      localStorage.sessionKey = sessionKey;
+      sessionStorage.sessionKey = sessionKey;
       $('first').style.display='none';
       $('second').style.display='none';
       $('settings').style.display='block';
     }
     function changeEmail() {
-      customer.changeEmail(localStorage.sessionKey, $('currentPwd').value, $('settingsEmail').value, function(err) {
+      customer.changeEmail(sessionStorage.sessionKey, $('currentPwd').value, $('settingsEmail').value, function(err) {
         alert(err);
       });
     }
     function changePwd() {
-      customer.changePassword(localStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
+      customer.changePassword(sessionStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
+        alert(err);
+      });
+    }
+    function resetPwd() {
+      //a password reset session is somehow special in that it doesn't require retyping your current password:
+      customer.changePassword(sessionStorage.sessionKey, null, $('password_reset').value, function(err) {
         alert(err);
       });
     }
     function deleteAccount() {
-      customer.deleteAccount(localStorage.sessionKey, $('currentPwd').value, function(err) {
+      customer.deleteAccount(sessionStorage.sessionKey, $('currentPwd').value, function(err) {
         alert(err);
       });
-    } 
+    }
+    function logout() {
+      $('first').style.display='block';
+      $('second').style.display='none';
+      $('settings').style.display='none';
+      delete localStorage.sessionKey;
+      delete sessionStorage.sessionKey;
+    }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
       if(location.hash.length) {
+        //someone is trying to use a token, log out the current session:
+        delete sessionStorage.sessionKey;
+        //even if it was remembered:
+        delete localStorage.sessionKey;
         var parts = location.hash.substring(1).split(':');
         location.hash = '';
         if(parts[0]=='verify') {
@@ -148,7 +174,7 @@
             if(err) {
               alert(err);
             } else {
-              showSession(sessionKey);
+              showSettings(sessionKey);
               alert('email address verified, thank you!');              
             }
           });
@@ -162,12 +188,18 @@
             if(err) {
               alert(err);
             } else {
-              showSession(sessionKey);
+              showSettings(sessionKey);
               alert('email address changed!');
             }
           });
         } else {
           alert('ignoring hash '+JSON.stringify(parts));
+        }
+      } else {
+        if(localStorage.sessionKey) {
+          showSettings(localStorage.sessionKey);
+        } else if(sessionStorage.sessionKey) {
+          showSettings(sessionStorage.sessionKey);
         }
       }
       genCaptcha();

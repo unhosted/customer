@@ -166,7 +166,8 @@ DROP TABLE IF EXISTS `sessions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sessions` (
   `uid` MEDIUMINT NOT NULL,
-  `token` varchar(255)
+  `token` varchar(255),
+  `is_a_password_reset_session` boolean default false
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
