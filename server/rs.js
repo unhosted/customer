@@ -1,5 +1,4 @@
 var mysql = require('mysql'),
-  rsconf = require('./rsconf').rsconf,
   config = require('./config').config;
 
 var connection = mysql.createConnection({

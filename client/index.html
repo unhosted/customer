@@ -65,10 +65,20 @@
         <input type="submit" value="Delete account" style="background:red" onclick="deleteAccount();" />
       </p>
     </div>
+    <div style="display:none" id="page-cms">
+      <h1>Choose life.</h1>
+      <h2>Choose a career.</h2>
+      <h3>Choose a profile picture.</h3>
+      <h4>Choose a location.</h4>
+      <h5>Choose a status.</h5>
+      <h6>Or choose something else.</h6>
+    </div>
+    <div style="display:none" id="page-auth">
+    </div>
   </body>
   <script src="backtofront.js"></script>
   <script>
-    var pages = ['first', 'forgot', 'resetPwd' 'second', 'settings', 'cms', 'auth'];
+    var pages = ['first', 'forgot', 'resetPwd', 'second', 'settings', 'cms', 'auth'];
     function showPage(id) {
       for(var i=0; i<pages.length; i++) {
         $('page-'+pages[i]).style.display=(pages[i]==id?'block':'none');
