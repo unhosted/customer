@@ -133,14 +133,13 @@
       $('second').style.display='none';
       $('settings').style.display='block';
     }
-    function changeEmail() {
-      customer.changeEmail(sessionStorage.sessionKey, $('currentPwd').value, $('settingsEmail').value, function(err) {
-        alert(err);
-      });
-    }
     function changePwd() {
       customer.changePassword(sessionStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
-        alert(err);
+        if(err) {
+          alert(err);
+        } else {
+          alert('password changed!');
+        }
       });
     }
     function completeForgotPassword() {
@@ -156,7 +155,12 @@
     }
     function deleteAccount() {
       customer.deleteAccount(sessionStorage.sessionKey, $('currentPwd').value, function(err) {
-        alert(err);
+        if(err) {
+          alert(err);
+        } else {
+          logout();
+          console.log('Sad to see you go. Have a nice life. Over and out!');
+        }
       });
     }
     function logout() {
