@@ -81,7 +81,7 @@ exports.createAccount = function(emailAddress, password, cb) {
     }
   });
 };
-exports.verifyEmail = function(tokenUid, cb) {
+exports.completeVerifyEmail = function(tokenUid, cb) {
   var parts = tokenUid.split('_');
   connection.query('UPDATE `customers` SET `status`= ?'
       +' WHERE `status` = ? AND `token` = ? AND `uid` = ?',
@@ -89,7 +89,7 @@ exports.verifyEmail = function(tokenUid, cb) {
     cb(err, parts[1]);
   });
 };
-exports.startResetPassword = function(emailAddress, cb) {
+exports.startForgotPassword = function(emailAddress, cb) {
   cb(null, 'maybe');//we don't tell the client if the attempt was successful, and send this immediately to avoid timing attacks
   var token = genToken();
   connection.query('SELECT `uid` FROM `customers`'
@@ -114,7 +114,7 @@ exports.startResetPassword = function(emailAddress, cb) {
     }
   });
 };
-exports.startEmailChange = function(uid, newEmail, cb) {
+exports.startChangeEmail = function(uid, newEmail, cb) {
   var token = genToken();
   console.log(USER.CHANGING, newEmail, uid, token);
   connection.query('UPDATE `customers` SET `status` = ?, `new_email_address` = ?, `token` = ? WHERE `uid` = ?',
@@ -126,7 +126,7 @@ exports.startEmailChange = function(uid, newEmail, cb) {
     });
   });
 };
-exports.completeEmailChange = function(uid, cb) {
+exports.completeChangeEmail = function(uid, cb) {
   var token = genToken();
   connection.query('UPDATE `customers` SET `status` = ?, `email_address` = `new_email_address`, `token` = NULL,'
       +'`new_email_address` = NULL WHERE `uid` = ?', [USER.VERIFIED, uid], cb);

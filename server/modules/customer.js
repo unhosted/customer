@@ -80,9 +80,9 @@ exports.getSettings = function(sessionKey, cb) {
   });
 };
 
-exports.resetPassword = function(email, captchaToken, captchaSolution, cb) {
+exports.startForgotPassword = function(email, captchaToken, captchaSolution, cb) {
   if(captcha.resolve(captchaToken, captchaSolution)) {
-    customer.startResetPassword(email, cb);
+    customer.startForgotPassword(email, cb);
   } else {
     cb('captcha wrong!');
   }
@@ -104,21 +104,21 @@ function checkSP(sessionKey, password, cb) {
     });
   }
 }
-exports.changeEmail = function(sessionKey, password, newEmail, cb) {
+exports.startChangeEmail = function(sessionKey, password, newEmail, cb) {
   checkSP(sessionKey, password, function(err, uid) {
     if(err) {
       cb(err);
     } else {
-      customer.startEmailChange(uid, newEmail, cb);
+      customer.startChangeEmail(uid, newEmail, cb);
     }
   });
 };
-exports.changeEmailConfirm = function(tokenUid, cb) {
+exports.completeChangeEmail = function(tokenUid, cb) {
   customer.checkTokenUid(tokenUid, function(err, uid) {
     if(err) {
       cb(err);
     } else {
-      customer.completeEmailChange(uid, function(err) {
+      customer.completeChangeEmail(uid, function(err) {
         if(err) {
           cb(err);
         } else {
@@ -128,8 +128,8 @@ exports.changeEmailConfirm = function(tokenUid, cb) {
     }
   });
 };
-exports.verify = function(tokenUid, cb) {
-  customer.verifyEmail(tokenUid, function(err, uid) {
+exports.completeVerifyEmail = function(tokenUid, cb) {
+  customer.completeVerifyEmail(tokenUid, function(err, uid) {
     if(err) {
       cb(err);
     } else {
@@ -137,7 +137,7 @@ exports.verify = function(tokenUid, cb) {
     }
   });
 };
-exports.changePasswordConfirm = function(tokenUid, newPassword, cb) {
+exports.completeForgotPassword = function(tokenUid, newPassword, cb) {
   customer.checkTokenUid(tokenUid, function(err, uid) {
     if(err) {
       cb(err);

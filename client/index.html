@@ -9,7 +9,7 @@
         <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
             <input id="pwd1" placeholder="Password" type="password" />
             <input type="submit" value="Sign in" onclick="signIn();"/></p>
-        <p style="margin-left:30px"><input id="remember" type="checkbox"/>Remember me | <a onclick="forgot();">Forgot password?</a></p>
+        <p style="margin-left:30px"><input id="remember" type="checkbox"/>Remember me | <a onclick="openForgotDialog();">Forgot password?</a></p>
       </div>
       <p style="clear:right; float:left; width:300px"><strong>Welcome to the web.</strong> Connect with friends and the world around you.
       </p>
@@ -33,13 +33,13 @@
         <p style="margin-left:30px"><input type="submit" value="regen" onclick="genCaptcha();" />
             <img id="captcha_forgot" />
             <input id="solution_forgot" />
-            <input type="submit" value="Send reminder" onclick="sendReminder();"/></p>
+            <input type="submit" value="Send reminder" onclick="startForgotPassword();"/></p>
       </div>
     </div>
     <div style="display:none" id="resetPwd">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="password_reset" type="password" placeholder="New password"/></p>
-        <p style="margin-left:30px"><input type="submit" value="Reset password" onclick="resetPwd();"/></p>
+        <p style="margin-left:30px"><input type="submit" value="Reset password" onclick="completeForgotPassword();"/></p>
       </div>
     </div>
     <div style="display:none" id="second">
@@ -56,7 +56,7 @@
       <h1 id="welcome">Welcome to your unhosted customer account <input type="submit" value="logout" onclick="logout();" /></h1>
       <p>
         <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
-        <input type="submit" value="Change" onclick="changeEmail();" />
+        <input type="submit" value="Change" onclick="startChangeEmail();" />
       </p>
       <p>
         Current: <input id="currentPwd" type="password" />
@@ -71,12 +71,12 @@
     function $(id) {
       return document.getElementById(id);
     }
-    function forgot() {
+    function openForgotDialog() {
       $('first').style.display='none';
       $('forgot').style.display='block';
     }
-    function sendReminder() {
-      customer.resetPassword($('email_forgot').value, localStorage.encrSolution, $('solution_forgot').value, function(err, data) {
+    function startForgotPassword() {
+      customer.startForgotPassword($('email_forgot').value, localStorage.encrSolution, $('solution_forgot').value, function(err, data) {
         alert(err);
         alert(data);
       });
@@ -143,9 +143,9 @@
         alert(err);
       });
     }
-    function resetPwd() {
+    function completeForgotPassword() {
       //a password reset session is somehow special in that it doesn't require retyping your current password:
-      customer.changePassword(sessionStorage.sessionKey, null, $('password_reset').value, function(err) {
+      customer.completeForgotPassword(sessionStorage.sessionKey, $('password_reset').value, function(err) {
         alert(err);
       });
     }
