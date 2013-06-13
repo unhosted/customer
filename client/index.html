@@ -170,7 +170,7 @@
         var parts = location.hash.substring(1).split(':');
         location.hash = '';
         if(parts[0]=='verify') {
-          customer.verify(parts[1], function(err, sessionKey) {
+          customer.completeVerifyEmail(parts[1], function(err, sessionKey) {
             if(err) {
               alert(err);
             } else {
@@ -184,7 +184,7 @@
           $('second').style.display='none';
           $('resetPwd').style.display='block';
         } else if(parts[0]=='email_change') {
-          customer.changeEmailConfirm(parts[1], function(err, sessionKey) {
+          customer.completeChangeEmail(parts[1], function(err, sessionKey) {
             if(err) {
               alert(err);
             } else {
