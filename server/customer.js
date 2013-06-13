@@ -146,17 +146,25 @@ exports.checkTokenUid = function(tokenUid, cb) {
 exports.changePassword = function(uid, newPassword, cb) {
   var passwordSalt = uuid();
   var passwordHash = crypto.createHash('sha256').update(newPassword).update(passwordSalt).digest('hex');
+  console.log('updating pwd for '+uid);
   connection.query('UPDATE `customers` SET `password_hash` = ?, `password_salt` = ?'
       +' WHERE `uid` = ?', [passwordHash, passwordSalt, uid], function(err, result) {
-    memcache.delete('pwd-u:'+uid);
-    exports.getEmail(uid, function(err, data) {
-      if(err) {
-        console.log(err);
-      } else {
-        memcache.delete('pwd:'+data.email);
-      }
-      cb();
-    });
+    if(err) {
+      console.log(err2);
+      cb(err);
+    } else {
+      memcache.delete('pwd-u:'+uid);
+      console.log('invalidating memcache');
+      exports.getEmail(uid, function(err2, data) {
+        if(err2) {
+          console.log(err2);
+          cb(err2);
+        } else {
+          memcache.delete('pwd:'+data.email);
+        }
+        cb();//success
+      });
+    }
   });
 };
 exports.checkUidPwd = function(uid, password, cb) {
