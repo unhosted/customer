@@ -72,6 +72,9 @@
       <h4>Choose a location.</h4>
       <h5>Choose a status.</h5>
       <h6>Or choose something else.</h6>
+      <input type="submit" value="settings" onclick="showPage('settings');" />
+      <input type="submit" value="auth" onclick="showPage('auth');" />
+      <input type="submit" value="view your profile" onclick="location='http://'+localStorage.host+'.un.ht/';" />
     </div>
     <div style="display:none" id="page-auth">
       <input id="origin" placeholder="origin" />
@@ -121,7 +124,7 @@
         if(err) {
           alert(err);
         } else {
-          showSettings(result);
+          showDashboard(result);
         }
       });
     }
@@ -133,11 +136,11 @@
           if($('remember').checked) {
             localStorage.sessionKey = result;
           }
-          showSettings(result);
+          showDashboard(result);
         }
       });
     }
-    function showSettings(sessionKey) {
+    function showDashboard(sessionKey) {
       customer.getSettings(sessionKey, function(err, obj) {
         if(err) {
           alert(err);
@@ -149,7 +152,7 @@
         }
       });
       sessionStorage.sessionKey = sessionKey;
-      showPage('settings');
+      showPage('cms');
     }
     function changePwd() {
       customer.changePassword(sessionStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
@@ -166,7 +169,7 @@
         if(err) {
           alert(err);
         } else {
-          showSettings(sessionKey);
+          showDashboard(sessionKey);
           alert('Password reset. Now remember it, ok? ;)');
         }
       });
@@ -200,7 +203,7 @@
               showPage('first');
               alert(err);
             } else {
-              showSettings(sessionKey);
+              showDashboard(sessionKey);
               alert('email address verified, thank you!');              
             }
           });
@@ -213,7 +216,7 @@
               showPage('first');
               alert(err);
             } else {
-              showSettings(sessionKey);
+              showDashboard(sessionKey);
               alert('email address changed!');
             }
           });
@@ -223,9 +226,9 @@
         }
       } else {
         if(localStorage.sessionKey) {
-          showSettings(localStorage.sessionKey);
+          showDashboard(localStorage.sessionKey);
         } else if(sessionStorage.sessionKey) {
-          showSettings(sessionStorage.sessionKey);
+          showDashboard(sessionStorage.sessionKey);
         } else {
           showPage('first');
         }

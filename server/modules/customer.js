@@ -2,6 +2,7 @@ var captcha = require('../captcha'),
   customer = require('../customer'),
   domain = require('../domain'),
   session = require('../session'),
+  bearer = require('../bearer'),
   rs = require('../rs'),
   config = require('../config').config;
 
@@ -183,7 +184,7 @@ exports.getBearerToken = function(sessionKey, origin, scope, cb) {
     if(err) {
       cb(err);
     } else {
-      bearerTokens.get(uid, origin, scope, cb);
+      bearer.get(uid, origin, scope, cb);
     }
   });
 }
@@ -193,7 +194,7 @@ exports.revokeBearerToken = function(sessionKey, origin, cb) {
     if(err) {
       cb(err);
     } else {
-      bearerTokens.revoke(uid, origin, cb);
+      bearer.revoke(uid, origin, cb);
     }
   });
 }
@@ -203,7 +204,7 @@ exports.listBearerTokens = function(sessionKey, cb) {
     if(err) {
       cb(err);
     } else {
-      bearerTokens.revoke(uid, cb);
+      bearer.list(uid, cb);
     }
   });
 }
