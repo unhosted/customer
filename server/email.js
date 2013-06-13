@@ -14,7 +14,15 @@ function sendTemplate(to, template, vars, cb) {
       from: 'support@unhosted.org',
       subject: templates[template][0],
       text: templates[template][1]+vars.token
-    }, cb);
+    }, function(success, message) {
+       if(success) {
+         cb(null);
+       } else if(message) {
+         cb(message);
+       } else {
+         cb('sendgrid failure, no message');
+       }
+    });
   }
 }
 exports.email = {

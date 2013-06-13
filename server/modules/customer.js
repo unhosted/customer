@@ -49,9 +49,12 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
           } else {
             var root = config.serverRoot[serverId]+host+'/public/dns/whois/'+host+'.un.ht/';
             domain.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
-    	        session.create(uid, cb);
+              if(err3) {
+                cb(err3);
+              } else {
+    	          session.create(uid, cb);
+              }
             });
-        
           }
         });
       }

@@ -20,8 +20,9 @@ function genSessionToken() {
 exports.create = function(uid, cb) {
   var sessionToken = genSessionToken();
   connection.query('INSERT INTO `sessions` (`uid`, `token`) VALUES (?, ?)', 
-      [uid, sessionToken], function(err4) {
-    cb(null, sessionToken);
+      [uid, sessionToken], function(err) {
+    console.log('session '+sessionToken+' created for uid '+uid);
+    cb(err, sessionToken);
   });
 };
 
