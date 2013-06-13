@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
   </head>
   <body style="width:800px;margin:0px auto">
-    <div id="first">
+    <div id="page-first">
       <div style="background:grey;width:650px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
             <input id="pwd1" placeholder="Password" type="password" />
@@ -27,7 +27,7 @@
              <input type="submit" value="Sign up for the web" onclick="step1();"/></p>
       </div>
     </div>
-    <div style="display:none" id="forgot">
+    <div style="display:none" id="page-forgot">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="email_forgot" placeholder="Email"/></p>
         <p style="margin-left:30px"><input type="submit" value="regen" onclick="genCaptcha();" />
@@ -36,13 +36,13 @@
             <input type="submit" value="Send reminder" onclick="startForgotPassword();"/></p>
       </div>
     </div>
-    <div style="display:none" id="resetPwd">
+    <div style="display:none" id="page-resetPwd">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="password_reset" type="password" placeholder="New password"/></p>
         <p style="margin-left:30px"><input type="submit" value="Reset password" onclick="completeForgotPassword();"/></p>
       </div>
     </div>
-    <div style="display:none" id="second">
+    <div style="display:none" id="page-second">
       <p><input placeholder="yourname" id="host" /><strong>.un.ht</strong></p>
       <p><strong>Terms of Service:</strong></p>
       <p><textarea id="tos" readOnly=true>Be nice!</textarea></p>
@@ -52,7 +52,7 @@
       <input id="solution" />
       <input type="submit" value="register" onclick="register();" />
     </div>
-    <div style="display:none" id="settings">
+    <div style="display:none" id="page-settings">
       <h1 id="welcome">Welcome to your unhosted customer account <input type="submit" value="logout" onclick="logout();" /></h1>
       <p>
         <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
@@ -68,12 +68,17 @@
   </body>
   <script src="backtofront.js"></script>
   <script>
+    var pages = ['first', 'forgot', 'resetPwd' 'second', 'settings', 'cms', 'auth'];
+    function showPage(id) {
+      for(var i=0; i<pages.length; i++) {
+        $('page-'+pages[i]).style.display=(pages[i]==id?'block':'none');
+      }
+    }
     function $(id) {
       return document.getElementById(id);
     }
     function openForgotDialog() {
-      $('first').style.display='none';
-      $('forgot').style.display='block';
+      showPage('forgot');
     }
     function startForgotPassword() {
       customer.startForgotPassword($('email_forgot').value, localStorage.encrSolution, $('solution_forgot').value, function(err, data) {
@@ -85,8 +90,7 @@
       localStorage.fullName = $('fn').value;
       localStorage.email = $('email').value;
       localStorage.pwd = $('pwd').value;
-      $('first').style.display='none';
-      $('second').style.display='block';
+      showPage('second');
     }
     function genCaptcha() {
       customer.requestCaptcha(function(uri, encrSolution, encrSalt) {
@@ -129,9 +133,7 @@
         }
       });
       sessionStorage.sessionKey = sessionKey;
-      $('first').style.display='none';
-      $('second').style.display='none';
-      $('settings').style.display='block';
+      showPage('settings');
     }
     function changePwd() {
       customer.changePassword(sessionStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
@@ -164,9 +166,7 @@
       });
     }
     function logout() {
-      $('first').style.display='block';
-      $('second').style.display='none';
-      $('settings').style.display='none';
+      showPage('first');
       delete localStorage.sessionKey;
       delete sessionStorage.sessionKey;
     }
@@ -189,9 +189,7 @@
           });
         } else if(parts[0]=='reset_password') {
           sessionStorage.resetPwd = parts[1];
-          $('first').style.display='none';
-          $('second').style.display='none';
-          $('resetPwd').style.display='block';
+          showPage('resetPwd');
         } else if(parts[0]=='email_change') {
           customer.completeChangeEmail(parts[1], function(err, sessionKey) {
             if(err) {
