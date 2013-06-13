@@ -145,8 +145,13 @@
     }
     function completeForgotPassword() {
       //a password reset session is somehow special in that it doesn't require retyping your current password:
-      customer.completeForgotPassword(sessionStorage.sessionKey, $('password_reset').value, function(err) {
-        alert(err);
+      customer.completeForgotPassword(sessionStorage.resetPwd, $('password_reset').value, function(err, sessionKey) {
+        if(err) {
+          alert(err);
+        } else {
+          showSettings(sessionKey);
+          alert('Password reset. Now remember it, ok? ;)');
+        }
       });
     }
     function deleteAccount() {
@@ -179,7 +184,7 @@
             }
           });
         } else if(parts[0]=='reset_password') {
-          localStorage.resetPwd = parts[1];
+          sessionStorage.resetPwd = parts[1];
           $('first').style.display='none';
           $('second').style.display='none';
           $('resetPwd').style.display='block';

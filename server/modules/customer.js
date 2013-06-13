@@ -133,6 +133,7 @@ exports.completeChangeEmail = function(tokenUid, cb) {
 };
 exports.completeVerifyEmail = function(tokenUid, cb) {
   customer.completeVerifyEmail(tokenUid, function(err, uid) {
+    console.log('email verified', err, uid);
     if(err) {
       cb(err);
     } else {
@@ -141,6 +142,7 @@ exports.completeVerifyEmail = function(tokenUid, cb) {
   });
 };
 exports.completeForgotPassword = function(tokenUid, newPassword, cb) {
+  console.log(tokenUid, newPassword, typeof(cb));
   customer.checkTokenUid(tokenUid, function(err, uid) {
     if(err) {
       cb(err);
