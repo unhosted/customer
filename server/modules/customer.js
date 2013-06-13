@@ -178,23 +178,32 @@ exports.deleteAccount = function(sessionKey, password, cb) {
   });
 };
 
-exports.addThing = function(uid, hash, type, params, cb) {
-};
+exports.getBearerToken = function(sessionKey, origin, scope, cb) {
+  session.getUid(sessionKey, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      bearerTokens.get(uid, origin, scope, cb);
+    }
+  });
+}
 
-exports.updateThing = function(uid, hash, thingId, newParams, cb) {
-};
+exports.revokeBearerToken = function(sessionKey, origin, cb) {
+  session.getUid(sessionKey, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      bearerTokens.revoke(uid, origin, cb);
+    }
+  });
+}
 
-exports.deleteThing = function(uid, hash, thingId, cb) {
-};
-
-exports.listThings = function(uid, sessionToken, cb) {
-};
-
-exports.listUsage = function(uid, sessionToken, cb) {
-};
-
-exports.listDonations = function(uid, sessionToken, cb) {
-};
-
-exports.customerDetails = function(uid, sessionToken, cb) {
-};
+exports.listBearerTokens = function(sessionKey, cb) {
+  session.getUid(sessionKey, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      bearerTokens.revoke(uid, cb);
+    }
+  });
+}

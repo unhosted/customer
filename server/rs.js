@@ -14,6 +14,12 @@ connection.connect();
 exports.createRemotestorage = function(uid, server, username, quota, cb) {
   connection.query('INSERT INTO `remotestorage` (`uid`, `server`, `username`, `quota`)'
       +' VALUES (?, ?, ?, ?)', [uid, server, username, quota], function(err, data) {
-    rsconf.setup(server, username, quota, cb);
+    if(err) {
+      cb(err);
+    } else {
+      console.log(server, username, quota, cb);
+      console.log('pretending to setup rsconf...');
+      cb();
+    }
   });
 };
