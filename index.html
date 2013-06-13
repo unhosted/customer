@@ -247,7 +247,7 @@
         });
       },
       revoke: function() {
-        customer.getBearerToken(sessionStorage.sessionKey, $('origin').value, function(err) {
+        customer.revokeBearerToken(sessionStorage.sessionKey, $('origin').value, function(err) {
           if(err) {
             alert(err);
           } else {
