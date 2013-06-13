@@ -74,6 +74,12 @@
       <h6>Or choose something else.</h6>
     </div>
     <div style="display:none" id="page-auth">
+      <input id="origin" placeholder="origin" />
+      <input id="scope" placeholder="scope" />
+      <input type="submit" value="Allow" onclick="auth.allow();" />
+      <input type="submit" value="Revoke" onclick="auth.revoke();" />
+      <input type="submit" value="List" onclick="auth.list();" />
+      <table id="auth_list" border="1"></table>
     </div>
   </body>
   <script src="backtofront.js"></script>
@@ -227,5 +233,38 @@
       genCaptcha();
       //fillSettings();
     });
+    var auth = {
+      allow: function() {
+        customer.getBearerToken(sessionStorage.sessionKey, $('origin').value, $('scope').value, function(err, token) {
+          if(err) {
+            alert(err);
+          } else {
+            window.location = $('origin').value+'#access_token='+token;
+          }
+        });
+      },
+      revoke: function() {
+        customer.getBearerToken(sessionStorage.sessionKey, $('origin').value, function(err) {
+          if(err) {
+            alert(err);
+          } else {
+            alert('revoked!');
+          }
+        });
+      },
+      list: function() {
+        customer.listBearerTokens(sessionStorage.sessionKey, function(err, rows) {
+          if(err) {
+            alert(err);
+          } else {
+            var str;
+            for(var i=0; i<rows.length; i++) {
+              str += '<tr><td>'+rows[i].origin+'</td><td>'+rows[i].scope+'</td></tr>';
+            }
+            $('auth_list').innerHTML = str;
+          }
+        });  
+      }
+    };
   </script>
 </html>
