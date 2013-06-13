@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
   </head>
   <body style="width:800px;margin:0px auto">
-    <div id="page-first">
+    <div id="page-first" style="display:none">
       <div style="background:grey;width:650px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
             <input id="pwd1" placeholder="Password" type="password" />
@@ -181,6 +181,7 @@
         if(parts[0]=='verify') {
           customer.completeVerifyEmail(parts[1], function(err, sessionKey) {
             if(err) {
+              showPage('first');
               alert(err);
             } else {
               showSettings(sessionKey);
@@ -193,6 +194,7 @@
         } else if(parts[0]=='email_change') {
           customer.completeChangeEmail(parts[1], function(err, sessionKey) {
             if(err) {
+              showPage('first');
               alert(err);
             } else {
               showSettings(sessionKey);
@@ -201,12 +203,15 @@
           });
         } else {
           alert('ignoring hash '+JSON.stringify(parts));
+          showPage('first');
         }
       } else {
         if(localStorage.sessionKey) {
           showSettings(localStorage.sessionKey);
         } else if(sessionStorage.sessionKey) {
           showSettings(sessionStorage.sessionKey);
+        } else {
+          showPage('first');
         }
       }
       genCaptcha();
