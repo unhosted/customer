@@ -5,7 +5,7 @@ var SendGrid = require('sendgrid').SendGrid,
     verify: ['Your unhosted account is almost ready!', 'Please visit https://unht-beta.heahdk.net:1234/#verify:'],
     changeFrom: ['Someone changed your email address!', 'If this wasn\'t you then please contact support!'],
     changeTo: ['Your email address is almost changed!', 'Please visit https://unht-beta.heahdk.net:1234/#email_change:'],
-    resetPassword: ['Your password is almost reset!', 'To choose your new password, please visit https://unht-beta.heahdk.net:1234/#password_change:']
+    resetPassword: ['Your password is almost reset!', 'To choose your new password, please visit https://unht-beta.heahdk.net:1234/#reset_password:']
   };
 function sendTemplate(to, template, vars, cb) {
   if(vars) {
