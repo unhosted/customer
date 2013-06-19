@@ -79,6 +79,7 @@ if(typeof(window) != 'undefined') {//client
         token: token,
         args: args
       };
+      console.log('outgoing', obj);
       sock.send(JSON.stringify(obj));
     }
   };
