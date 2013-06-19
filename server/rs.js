@@ -25,7 +25,7 @@ function createSystemUser(uid, username, cb) {
           on('close', function(mkdircode) {
             if(mkdircode == 0) {
               console.log('createSystemUser -> ln -s');
-              spawn('ln', ['-s', '/data/remotestorage/' + username, '/home/' + username + '/storage/']).
+              spawn('ln', ['-s', '/data/remotestorage/' + username, '/home/' + username + '/storage']).
                 on('close', function(lncode) {
                   if(lncode == 0) {
                     console.log('createSystemUser -> chown');
