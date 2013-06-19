@@ -44,6 +44,9 @@ exports.get = function(uid, origin, scope, cb) {
 };
 
 exports.revoke = function(uid, origin, token, cb) {
+  if(typeof(cb) !== 'function') {
+    throw("callback not given!");
+  }
   console.log('revoking bearer token for '+uid+', '+origin+', '+token);
   connection.query('SELECT `token` FROM `rstokens` WHERE `uid` = ? AND `origin` = ? AND `token` = ?', [uid, origin, token], function(err, rows) {
     connection.query('DELETE FROM `rstokens` WHERE `uid` = ? AND `origin` = ?', [uid, origin], function(err) {
