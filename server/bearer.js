@@ -56,7 +56,7 @@ exports.revoke = function(uid, origin, token, cb) {
 };
 
 exports.list = function(uid, cb) {
-  connection.query('SELECT `origin`, `scope`, `token` FROM `rstokens` WHERE `uid`', [uid], function(err, rows) {
+  connection.query('SELECT `origin`, `scope`, `token` FROM `rstokens` WHERE `uid` = ?', [uid], function(err, rows) {
      cb(err, rows);//listing from db, hopefully this will always stay in sync with the output of rs-list-tokens
   });
 };
