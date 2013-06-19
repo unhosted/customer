@@ -34,18 +34,28 @@ function exec(scriptName, args, cb) {
 
 exports.get = function(uid, origin, scope, cb) {
   var bearerToken = genBearerToken();
+  // get existing token:
   connection.query(
-    'SELECT username FROM remotestorage WHERE uid = ?', [uid],
-    function(err, result) {
+    'SELECT * FROM rstokens WHERE uid = ? AND origin = ? AND scope = ?', [uid, origin, scope], function(err, selectResult) {
       if(err) return cb(err);
-      connection.query('INSERT INTO `rstokens` (`uid`, `origin`, `scope`, `token`) VALUES (?, ?, ?, ?)', [uid, origin, scope, bearerToken], function(err) {
-        var args = [result[0].username, bearerToken].concat(scope.split(' '));
-        exec('rs-add-token', args);
-        console.log('bearer token '+bearerToken+' created for uid '+uid);
-        cb(err, bearerToken);
-      });
-    }
-  );
+      if(selectResults.length > 0) {
+        cb(undefined, selectResults[0].token);
+      } else {
+        connection.query(
+          'SELECT username FROM remotestorage WHERE uid = ?', [uid],
+          function(err, result) {
+            if(err) return cb(err);
+            connection.query('INSERT INTO `rstokens` (`uid`, `origin`, `scope`, `token`) VALUES (?, ?, ?, ?)', [uid, origin, scope, bearerToken], function(err) {
+              var args = [result[0].username, bearerToken].concat(scope.split(' '));
+              exec('rs-add-token', args);
+              console.log('bearer token '+bearerToken+' created for uid '+uid);
+              cb(err, bearerToken);
+            });
+          }
+        );
+      }
+    })
+  ;
 };
 
 exports.revoke = function(uid, origin, token, cb) {
