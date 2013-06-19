@@ -1,10 +1,17 @@
 if(typeof(window) != 'undefined') {//client
-  window.backtofront = {};
-  window.backtofront.connect = function(url, token, cb) {
+  var backtofront = {};
+  if(typeof(window.define) === 'function') {
+    define([], function() { return backtofront; });
+  } else {
+    window.backtofront = backtofront;
+  }
+  backtofront.connect = function(url, token, cb) {
     var sock = new WebSocket(url);
+    var open = false;
     sock.onopen = function() {
       console.log('open');
     };
+      open = true;
     sock.onmessage = function(e) {
       var obj;
       try {
@@ -29,11 +36,17 @@ if(typeof(window) != 'undefined') {//client
         if(typeof(cb)=='function') {
           cb();
         }
+      } else if(obj.error) {
+        if(backtofront.onerror) {
+          backtofront.onerror(obj.error);
+        } else {
+          console.error("UNCAUGHT ERROR:", obj.error);
+        }
       } else {
         if(running[obj.callback]) {
           console.log('running', typeof(running[obj.callback]), obj.args);
           running[obj.callback].apply(null, obj.args);
-          delete running[obj.callback];
+          //delete running[obj.callback];
         } else {
           console.log('not found', running);
         }
@@ -41,12 +54,19 @@ if(typeof(window) != 'undefined') {//client
      };
     sock.onclose = function() {
       console.log('closed');
+      if(backtofront.onerror) {
+        if(open) {
+          backtofront.onerror('connection-closed', "Connection was closed. Reload to save the day.");
+        } else {
+          backtofront.onerror('connection-failed', "Failed to connect to backend.");
+        }
+      }
     };
-    var running = {}, runningId = 0;
+    var running = {};
     function send(module, method, args) {
       for(var i=0; i<args.length; i++) {
         if(typeof(args[i])=='function') {
-          id = new Date().getTime()+'-'+runningId;
+          id = new Date().getTime()+'-'+running.length;
           running[id] = args[i];
           args[i]='_function_'+id;
         } else if (typeof(args[i])=='string') {
@@ -74,18 +94,13 @@ if(typeof(window) != 'undefined') {//client
     ca: fs.readFileSync('./tls/ca.pem') 
   }, function(req, res) {
     res.writeHead(200);
-    if(req.url == '/backtofront.js') {
-      res.end(fs.readFileSync('../client/backtofront.js'));
-    } else { 
-      res.end(fs.readFileSync('../client/index.html')); 
-    }
+    res.end('connect a websocket please'); 
   });
   httpsServer.listen(argv[2]);
-  console.log('listening on port '+argv[2]);
+  console.log('listening on port '+argv[3]);
 
   var sockServer = sockjs.createServer();
   sockServer.on('connection', function(conn) {
-    console.log('connection on sockServer');
     var methodNames = {};
     for(var i in modules) {
       methodNames[i]={};
@@ -93,15 +108,12 @@ if(typeof(window) != 'undefined') {//client
         methodNames[i][j]='default';
       }
     }
-    console.log('writing register');
     conn.write(JSON.stringify({
       type: 'register',
       modules: methodNames
     }));
     //FIXME: does this work with messages of >32Kb?
-    console.log('setting on data');
     conn.on('data', function(chunk) {
-      console.log(chunk);
       var obj, argList=[];
       try {
         obj = JSON.parse(chunk);
@@ -137,7 +149,18 @@ if(typeof(window) != 'undefined') {//client
           }
         }
         console.log('apply', argList);
-        modules[obj.module][obj.method].apply(null, argList);
+        try {
+          modules[obj.module][obj.method].apply(null, argList);
+        } catch(exc) {
+          var error = {};
+          if(typeof(exc) === 'object' && exc instanceof Error) {
+            error.message = exc.message;
+            error.stack = exc.stack;
+          } else {
+            error = exc;
+          }
+          conn.write(JSON.stringify({ error: error }));
+        };
         return;
       }
       conn.write(JSON.stringify({
@@ -145,7 +168,6 @@ if(typeof(window) != 'undefined') {//client
         unparseable: chunk
       }));
     });
-    console.log('yep');
   });
   sockServer.installHandlers(httpsServer, {
     prefix: '/sock'
