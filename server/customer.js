@@ -17,7 +17,7 @@ connection.connect();
 var memcache = new Memcache.Client(config.memcache.port, config.memcache.host);
 memcache.connect();
 
-connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+connection.query('SELECT 6 * 7 AS solution', function(err, rows, fields) {
   if (err) throw err;
 
   //console.log('The solution is: ', rows[0].solution);
