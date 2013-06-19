@@ -34,13 +34,18 @@ function exec(scriptName, args, cb) {
 
 exports.get = function(uid, origin, scope, cb) {
   var bearerToken = genBearerToken();
-  connection.query('INSERT INTO `rstokens` (`uid`, `origin`, `scope`, `token`) VALUES (?, ?, ?, ?)', 
-      [uid, origin, scope, bearerToken], function(err) {
-    var args = ['rs'+uid, bearerToken].concat(scope.split(' '));
-    exec('rs-add-token', args);
-    console.log('bearer token '+bearerToken+' created for uid '+uid);
-    cb(err, bearerToken);
-  });
+  connection.query(
+    'SELECT username FROM remotestorage WHERE uid = ?', [uid],
+    function(err, result) {
+      if(err) return cb(err);
+      connection.query('INSERT INTO `rstokens` (`uid`, `origin`, `scope`, `token`) VALUES (?, ?, ?, ?)', [uid, origin, scope, bearerToken], function(err) {
+        var args = [result[0].username, bearerToken].concat(scope.split(' '));
+        exec('rs-add-token', args);
+        console.log('bearer token '+bearerToken+' created for uid '+uid);
+        cb(err, bearerToken);
+      });
+    }
+  );
 };
 
 exports.revoke = function(uid, origin, token, cb) {
@@ -48,11 +53,17 @@ exports.revoke = function(uid, origin, token, cb) {
     throw("callback not given!");
   }
   console.log('revoking bearer token for '+uid+', '+origin+', '+token);
-  connection.query('DELETE FROM `rstokens` WHERE `uid` = ? AND `origin` = ? AND `token` = ?', [uid, origin, token], function(err) {
-    console.log('(bearer.revoke) DELETE returned: ', arguments);
-    if(err) cb(err);
-    else { exec('rs-remove-token', ['rs'+uid, token]); cb(); }
-  });
+  connection.query(
+    'SELECT username FROM remotestorage WHERE uid = ?', [uid],
+    function(err, result) {
+      if(err) return cb(err);
+      connection.query('DELETE FROM `rstokens` WHERE `uid` = ? AND `origin` = ? AND `token` = ?', [uid, origin, token], function(err) {
+        console.log('(bearer.revoke) DELETE returned: ', arguments);
+        if(err) cb(err);
+        else { exec('rs-remove-token', [result[0].username, token]); cb(); }
+      });
+    }
+  );
 };
 
 exports.list = function(uid, cb) {
