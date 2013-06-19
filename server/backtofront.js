@@ -157,7 +157,7 @@ if(typeof(window) != 'undefined') {//client
           modules[obj.module][obj.method].apply(null, argList);
         } catch(exc) {
           var error = {};
-          if(typeof(exc) === 'object' && exc instanceof Error) {
+          if('stack' in error) {
             error.message = exc.message;
             error.stack = exc.stack;
           } else {
