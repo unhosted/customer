@@ -48,11 +48,9 @@ exports.revoke = function(uid, origin, token, cb) {
     throw("callback not given!");
   }
   console.log('revoking bearer token for '+uid+', '+origin+', '+token);
-  connection.query('SELECT `token` FROM `rstokens` WHERE `uid` = ? AND `origin` = ? AND `token` = ?', [uid, origin, token], function(err, rows) {
-    connection.query('DELETE FROM `rstokens` WHERE `uid` = ? AND `origin` = ?', [uid, origin], function(err) {
-      if(err) cb(err);
-      else { exec('rs-remove-token', ['rs'+uid, token]); cb(); }
-    });
+  connection.query('DELETE FROM `rstokens` WHERE `uid` = ? AND `origin` = ? AND `token` = ?', [uid, origin, token], function(err) {
+    if(err) cb(err);
+    else { exec('rs-remove-token', ['rs'+uid, token]); cb(); }
   });
 };
 
