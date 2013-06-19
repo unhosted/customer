@@ -17,7 +17,7 @@ var MIN_UID = 10000;
 function createSystemUser(uid, username, cb) {
   // FIXME: lots of hardcoded things here!!!
   console.log('createSystemUser -> adduser');
-  spawn('adduser', ['--uid', (MIN_UID + uid).toString(), username]).
+  spawn('adduser', ['--uid', (MIN_UID + uid).toString(), '--disabled-login', '--disabled-password', '--gecos', '', username]).
     on('close', function(code) {
       if(code == 0) {
         console.log('createSystemUser -> mkdir');
