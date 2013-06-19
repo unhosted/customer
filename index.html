@@ -13,9 +13,11 @@
 
     <div id="page-first" class="page">
       <div style="background:grey;width:650px;float:right;margin-top:50px">
-        <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
+        <form onsubmit="signIn();return false;">
+          <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
             <input id="pwd1" placeholder="Password" type="password" />
-            <input type="submit" value="Sign in" onclick="signIn();"/></p>
+            <input type="submit" value="Sign in" onclick=""/></p>
+        </form>
         <p style="margin-left:30px"><input id="remember" type="checkbox"/>Remember me | <a onclick="openForgotDialog();">Forgot password?</a></p>
       </div>
       <p style="clear:right; float:left; width:300px"><strong>Welcome to the web.</strong> Connect with friends and the world around you.
@@ -68,7 +70,8 @@
 
 
     <div class="page" id="page-settings">
-      <h1 id="welcome">Welcome to your unhosted customer account <input type="submit" value="logout" onclick="logout();" /></h1>
+      <a href="?!">&laquo; Back</a>
+      <h1>Settings</h1>
       <p>
         <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
         <input type="submit" value="Change" onclick="startChangeEmail();" />
@@ -89,9 +92,10 @@
       <h4>Choose a location.</h4>
       <h5>Choose a status.</h5>
       <h6>Or choose something else.</h6>
-      <input type="submit" value="settings" onclick="jump('/settings');" />
-      <input type="submit" value="auth" onclick="jump('/auth');" />
-      <input type="submit" value="view your profile" onclick="location='http://'+localStorage.host+'.un.ht/';" />
+      <button onclick="jump('/settings');">settings</button>
+      <button onclick="jump('/auth');">auth</button>
+      <button onclick="location='http://'+localStorage.host+'.un.ht/';">view your profile</button>
+      <button onclick="logout();">logout</button>
     </div>
 
 
