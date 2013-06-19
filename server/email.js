@@ -1,11 +1,14 @@
+
+var APP_URL = 'https://unht-customer-beta.5apps.com/';
+
 var SendGrid = require('sendgrid').SendGrid,
   config = require('./config').config,
   sendgrid = new SendGrid(config.sendgrid.user, config.sendgrid.password),
   templates = {
-    verify: ['Your unhosted account is almost ready!', 'Please visit https://unht-beta.heahdk.net:1234/#verify:'],
+    verify: ['Your unhosted account is almost ready!', 'Please visit '+APP_URL+'#verify:'],
     changeFrom: ['Someone changed your email address!', 'If this wasn\'t you then please contact support!'],
-    changeTo: ['Your email address is almost changed!', 'Please visit https://unht-beta.heahdk.net:1234/#email_change:'],
-    resetPassword: ['Your password is almost reset!', 'To choose your new password, please visit https://unht-beta.heahdk.net:1234/#reset_password:']
+    changeTo: ['Your email address is almost changed!', 'Please visit '+APP_URL+'#email_change:'],
+    resetPassword: ['Your password is almost reset!', 'To choose your new password, please visit '+APP_URL+'#reset_password:']
   };
 function sendTemplate(to, template, vars, cb) {
   if(vars) {
