@@ -2,9 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <script src="require.js" data-main="main"></script>
+    <style>
+      .page { display: none; }
+    </style>
   </head>
-  <body style="width:800px;margin:0px auto">
-    <div id="page-first" style="display:none">
+  <body style="width:800px;margin:0px auto" data-backend-uri="wss://unht-beta.heahdk.net:1234/sock/websocket" data-backend-secret="my_secret">
+
+    <div id="message"></div>
+
+    <div id="page-first" class="page">
       <div style="background:grey;width:650px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="email1" placeholder="Email"/>
             <input id="pwd1" placeholder="Password" type="password" />
@@ -27,7 +34,9 @@
              <input type="submit" value="Sign up for the web" onclick="step1();"/></p>
       </div>
     </div>
-    <div style="display:none" id="page-forgot">
+
+
+    <div id="page-forgot" class="page">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="email_forgot" placeholder="Email"/></p>
         <p style="margin-left:30px"><input type="submit" value="regen" onclick="genCaptcha();" />
@@ -36,13 +45,17 @@
             <input type="submit" value="Send reminder" onclick="startForgotPassword();"/></p>
       </div>
     </div>
-    <div style="display:none" id="page-resetPwd">
+
+
+    <div class="page" id="page-resetPwd">
       <div style="background:grey;width:350px;float:right;margin-top:50px">
         <p style="margin-left:30px"><input id="password_reset" type="password" placeholder="New password"/></p>
         <p style="margin-left:30px"><input type="submit" value="Reset password" onclick="completeForgotPassword();"/></p>
       </div>
     </div>
-    <div style="display:none" id="page-second">
+
+
+    <div class="page" id="page-second">
       <p><input placeholder="yourname" id="host" /><strong>.un.ht</strong></p>
       <p><strong>Terms of Service:</strong></p>
       <p><textarea id="tos" readOnly=true>Be nice!</textarea></p>
@@ -52,7 +65,9 @@
       <input id="solution" />
       <input type="submit" value="register" onclick="register();" />
     </div>
-    <div style="display:none" id="page-settings">
+
+
+    <div class="page" id="page-settings">
       <h1 id="welcome">Welcome to your unhosted customer account <input type="submit" value="logout" onclick="logout();" /></h1>
       <p>
         <input id="settingsEmail" /><input type="submit" value="Resend validation email" id="validateEmail"/>
@@ -65,209 +80,46 @@
         <input type="submit" value="Delete account" style="background:red" onclick="deleteAccount();" />
       </p>
     </div>
-    <div style="display:none" id="page-cms">
+
+
+    <div class="page" id="page-cms">
       <h1>Choose life.</h1>
       <h2>Choose a career.</h2>
       <h3>Choose a profile picture.</h3>
       <h4>Choose a location.</h4>
       <h5>Choose a status.</h5>
       <h6>Or choose something else.</h6>
-      <input type="submit" value="settings" onclick="showPage('settings');" />
-      <input type="submit" value="auth" onclick="showPage('auth');" />
+      <input type="submit" value="settings" onclick="jump('/settings');" />
+      <input type="submit" value="auth" onclick="jump('/auth');" />
       <input type="submit" value="view your profile" onclick="location='http://'+localStorage.host+'.un.ht/';" />
     </div>
-    <div style="display:none" id="page-auth">
-      <input id="origin" placeholder="origin" />
-      <input id="scope" placeholder="scope" />
-      <input type="submit" value="Allow" onclick="auth.allow();" />
-      <input type="submit" value="Revoke" onclick="auth.revoke();" />
-      <input type="submit" value="List" onclick="auth.list();" />
+
+
+    <div class="page" id="page-auth">
+      <a href="?!/">&laquo; Back</a>
+      <h1>List tokens</h1>
       <table id="auth_list" border="1"></table>
+
+      <h2>New Token</h2>
+      <form action="?!/auth">
+        <div><label>Scope: <input name="scope" type="text"></label></div>
+        <div><label>Redirect URI: <input name="redirect_uri" type="text"></label></div>
+        <div><input type="submit" value="Request"></div>
+      </form>
     </div>
+
+    <div class="page" id="page-auth-ask-allow">
+      <h2>Authorize</h2>
+      <p>The app at <span style="font-weight:bold" id="ask-origin"></span> wants to access the following scopes:</p>
+      <ul id="ask-scopes"></ul>
+      <input type="hidden" id="ask-params">
+      <button onclick="auth.allow();">Allow</button>
+    </div>
+
+    <div class="page" id="page-error">
+      <h1>Error: <span id="page-error-message"></span></h1>
+      <pre id="page-error-details"></pre>
+    </div>
+
   </body>
-  <script src="backtofront.js"></script>
-  <script>
-    var pages = ['first', 'forgot', 'resetPwd', 'second', 'settings', 'cms', 'auth'];
-    function showPage(id) {
-      for(var i=0; i<pages.length; i++) {
-        $('page-'+pages[i]).style.display=(pages[i]==id?'block':'none');
-      }
-    }
-    function $(id) {
-      return document.getElementById(id);
-    }
-    function openForgotDialog() {
-      showPage('forgot');
-    }
-    function startForgotPassword() {
-      customer.startForgotPassword($('email_forgot').value, localStorage.encrSolution, $('solution_forgot').value, function(err, data) {
-        alert(err);
-        alert(data);
-      });
-    }
-    function step1() {
-      localStorage.fullName = $('fn').value;
-      localStorage.email = $('email').value;
-      localStorage.pwd = $('pwd').value;
-      showPage('second');
-    }
-    function genCaptcha() {
-      customer.requestCaptcha(function(uri, encrSolution, encrSalt) {
-        $('captcha').setAttribute('src', uri);
-        $('captcha_forgot').setAttribute('src', uri);
-        localStorage.encrSolution = encrSolution;
-        localStorage.encrSalt = encrSalt;
-      });
-    }
-    function register() {
-      customer.requestAccount(($('agree').checked?$('tos').innerHTML:''), localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(err, result) {
-        if(err) {
-          alert(err);
-        } else {
-          showDashboard(result);
-        }
-      });
-    }
-    function signIn() {
-      customer.getSession($('email1').value, $('pwd1').value, function(err, result) {
-        if(err) {
-          alert(err);
-        } else {
-          if($('remember').checked) {
-            localStorage.sessionKey = result;
-          }
-          showDashboard(result);
-        }
-      });
-    }
-    function showDashboard(sessionKey) {
-      customer.getSettings(sessionKey, function(err, obj) {
-        if(err) {
-          alert(err);
-        } else {
-          $('settingsEmail').value = obj.email;
-          if(obj.emailValidated) {
-            $('validateEmail').style.display='none';
-          }
-        }
-      });
-      sessionStorage.sessionKey = sessionKey;
-      showPage('cms');
-    }
-    function changePwd() {
-      customer.changePassword(sessionStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
-        if(err) {
-          alert(err);
-        } else {
-          alert('password changed!');
-        }
-      });
-    }
-    function completeForgotPassword() {
-      //a password reset session is somehow special in that it doesn't require retyping your current password:
-      customer.completeForgotPassword(sessionStorage.resetPwd, $('password_reset').value, function(err, sessionKey) {
-        if(err) {
-          alert(err);
-        } else {
-          showDashboard(sessionKey);
-          alert('Password reset. Now remember it, ok? ;)');
-        }
-      });
-    }
-    function deleteAccount() {
-      customer.deleteAccount(sessionStorage.sessionKey, $('currentPwd').value, function(err) {
-        if(err) {
-          alert(err);
-        } else {
-          logout();
-          console.log('Sad to see you go. Have a nice life. Over and out!');
-        }
-      });
-    }
-    function logout() {
-      showPage('first');
-      delete localStorage.sessionKey;
-      delete sessionStorage.sessionKey;
-    }
-    backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function() {
-      if(location.hash.length) {
-        //someone is trying to use a token, log out the current session:
-        delete sessionStorage.sessionKey;
-        //even if it was remembered:
-        delete localStorage.sessionKey;
-        var parts = location.hash.substring(1).split(':');
-        location.hash = '';
-        if(parts[0]=='verify') {
-          customer.completeVerifyEmail(parts[1], function(err, sessionKey) {
-            if(err) {
-              showPage('first');
-              alert(err);
-            } else {
-              showDashboard(sessionKey);
-              alert('email address verified, thank you!');              
-            }
-          });
-        } else if(parts[0]=='reset_password') {
-          sessionStorage.resetPwd = parts[1];
-          showPage('resetPwd');
-        } else if(parts[0]=='email_change') {
-          customer.completeChangeEmail(parts[1], function(err, sessionKey) {
-            if(err) {
-              showPage('first');
-              alert(err);
-            } else {
-              showDashboard(sessionKey);
-              alert('email address changed!');
-            }
-          });
-        } else {
-          alert('ignoring hash '+JSON.stringify(parts));
-          showPage('first');
-        }
-      } else {
-        if(localStorage.sessionKey) {
-          showDashboard(localStorage.sessionKey);
-        } else if(sessionStorage.sessionKey) {
-          showDashboard(sessionStorage.sessionKey);
-        } else {
-          showPage('first');
-        }
-      }
-      genCaptcha();
-      //fillSettings();
-    });
-    var auth = {
-      allow: function() {
-        customer.getBearerToken(sessionStorage.sessionKey, $('origin').value, $('scope').value, function(err, token) {
-          if(err) {
-            alert(err);
-          } else {
-            window.location = $('origin').value+'#access_token='+token;
-          }
-        });
-      },
-      revoke: function() {
-        customer.revokeBearerToken(sessionStorage.sessionKey, $('origin').value, function(err) {
-          if(err) {
-            alert(err);
-          } else {
-            alert('revoked!');
-          }
-        });
-      },
-      list: function() {
-        customer.listBearerTokens(sessionStorage.sessionKey, function(err, rows) {
-          if(err) {
-            alert(err);
-          } else {
-            var str;
-            for(var i=0; i<rows.length; i++) {
-              str += '<tr><td>'+rows[i].origin+'</td><td>'+rows[i].scope+'</td></tr>';
-            }
-            $('auth_list').innerHTML = str;
-          }
-        });  
-      }
-    };
-  </script>
 </html>
