@@ -257,9 +257,9 @@ define(['./backtofront'], function(backtofront) {
         if(err) {
           showError('listBearerTokens failed', err);
         } else {
-          var str = '';
+          var str = '<tr><th>Origin</th><th>Scope</th><th>Token</th><th></th></tr>';
           for(var i=0; i<rows.length; i++) {
-            str += '<tr><td>'+rows[i].origin+'</td><td>'+rows[i].scope+'</td><td><button onclick="auth.revoke(\''+rows[i].origin+'\', \''+rows[i].token+'\');">Revoke</button></td></tr>';
+            str += '<tr><td>'+rows[i].origin+'</td><td>'+rows[i].scope+'</td><td>'+rows[i].token+'</td><td><button onclick="auth.revoke(\''+rows[i].origin+'\', \''+rows[i].token+'\');">Revoke</button></td></tr>';
           }
           $('auth_list').innerHTML = str;
         }
