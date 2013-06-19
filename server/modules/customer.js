@@ -8,25 +8,30 @@ var captcha = require('../captcha'),
   config = require('../config').config;
 
 exports.requestCaptcha = function(cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   captcha.get(cb);
 };
 
 function validEmail(str) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   return typeof(str)=='string' && str.match(/^([a-z0-9\.\_\+\%\-]+@[a-z0-9\.\-]+\.[a-z]+)$/g);
                                                //  (chars)           @ (chars)      .(letters)
 }
 
 function validPassword(str) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   return typeof(str)=='string' && str.length > 5;
   //any string of length >= 5
 }
 
 function validHost(str) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   return typeof(str)=='string' && str.match(/^([a-z0-9][a-z0-9\-]*[a-z0-9])$/g);
                                              // (one lc) (lc or -)  (one lc)
 }
 
 exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSolution, host, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   email = email.toLowerCase().trim();
   host = host.toLowerCase().trim();
   if(agree != 'Be nice!') {
@@ -91,6 +96,7 @@ exports.disobey = function(twitterKeys, cb) {
 };
     
 exports.getSession = function(email, pwd, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   console.log('getSession', email, pwd);
   customer.checkEmailPwd(email, pwd, function(err, result) {
     console.log(err, result);
@@ -102,6 +108,7 @@ exports.getSession = function(email, pwd, cb) {
   });
 };
 exports.getSettings = function(sessionKey, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   session.getUid(sessionKey, function(err, uid) {
     if(err) {
       cb(err);
@@ -112,6 +119,7 @@ exports.getSettings = function(sessionKey, cb) {
 };
 
 exports.startForgotPassword = function(email, captchaToken, captchaSolution, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   if(captcha.resolve(captchaToken, captchaSolution)) {
     customer.startForgotPassword(email, cb);
   } else {
@@ -120,6 +128,7 @@ exports.startForgotPassword = function(email, captchaToken, captchaSolution, cb)
 };
 
 function checkSP(sessionKey, password, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   if(typeof(sessionKey) != 'string' || !sessionKey.length) {
     cb('no session key supplied');
   } else if(typeof(password) != 'string' || !password.length) {
@@ -160,6 +169,7 @@ exports.completeChangeEmail = function(tokenUid, cb) {
   });
 };
 exports.completeVerifyEmail = function(tokenUid, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   customer.completeVerifyEmail(tokenUid, function(err, uid) {
     console.log('email verified', err, uid);
     if(err) {
@@ -170,6 +180,7 @@ exports.completeVerifyEmail = function(tokenUid, cb) {
   });
 };
 exports.completeForgotPassword = function(tokenUid, newPassword, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   console.log(tokenUid, newPassword, typeof(cb));
   customer.checkTokenUid(tokenUid, function(err, uid) {
     if(err) {
@@ -186,6 +197,7 @@ exports.completeForgotPassword = function(tokenUid, newPassword, cb) {
   });
 }
 exports.changePassword = function(sessionKey, password, newPassword, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   console.log('changePassword', sessionKey, password, newPassword, typeof(cb));
   checkSP(sessionKey, password, function(err, uid) {
     if(err) {
@@ -197,6 +209,7 @@ exports.changePassword = function(sessionKey, password, newPassword, cb) {
 };
 
 exports.deleteAccount = function(sessionKey, password, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   checkSP(sessionKey, password, function(err, uid) {
     if(err) {
       cb(err);
@@ -207,6 +220,7 @@ exports.deleteAccount = function(sessionKey, password, cb) {
 };
 
 exports.getBearerToken = function(sessionKey, origin, scope, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   session.getUid(sessionKey, function(err, uid) {
     if(err) {
       cb(err);
@@ -217,6 +231,7 @@ exports.getBearerToken = function(sessionKey, origin, scope, cb) {
 }
 
 exports.revokeBearerToken = function(sessionKey, origin, token, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   session.getUid(sessionKey, function(err, uid) {
     if(err) {
       cb(err);
@@ -227,6 +242,7 @@ exports.revokeBearerToken = function(sessionKey, origin, token, cb) {
 }
 
 exports.listBearerTokens = function(sessionKey, cb) {
+  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   session.getUid(sessionKey, function(err, uid) {
     if(err) {
       cb(err);
