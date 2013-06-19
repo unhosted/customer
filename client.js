@@ -54,8 +54,11 @@ define(['./backtofront'], function(backtofront) {
 
     startForgotPassword: function() {
       customer.startForgotPassword($('email_forgot').value, localStorage.encrSolution, $('solution_forgot').value, function(err, data) {
-        alert(err);
-        alert(data);
+        if(err) {
+          showError('start forgot password error', err);
+        } else {
+          alert('start forgot password result: ' + data);
+        }
       });
     },
 
@@ -79,7 +82,7 @@ define(['./backtofront'], function(backtofront) {
       customer.requestAccount(($('agree').checked?$('tos').innerHTML:''), localStorage.email, localStorage.pwd, localStorage.encrSolution, $('solution').value, $('host').value, function(err, result) {
         console.log('register err & result', err, result);
         if(err) {
-          alert(JSON.stringify(err));
+          showError('requestAccount error', JSON.stringify(err));
         } else {
           showDashboard(result);
         }
@@ -89,7 +92,7 @@ define(['./backtofront'], function(backtofront) {
     signIn: function() {
       customer.getSession($('email1').value, $('pwd1').value, function(err, result) {
         if(err) {
-          alert(err);
+          showError('getSession error ', err);
         } else {
           if($('remember').checked) {
             localStorage.sessionKey = result;
@@ -102,7 +105,7 @@ define(['./backtofront'], function(backtofront) {
     showDashboard: function(sessionKey) {
       customer.getSettings(sessionKey, function(err, obj) {
         if(err) {
-          alert(err);
+          showError('getSettings error', err);
         } else {
           $('settingsEmail').value = obj.email;
           if(obj.emailValidated) {
@@ -117,7 +120,7 @@ define(['./backtofront'], function(backtofront) {
     changePwd: function() {
       customer.changePassword(sessionStorage.sessionKey, $('currentPwd').value, $('newPwd').value, function(err) {
         if(err) {
-          alert(err);
+          showError('changePassword error', err);
         } else {
           alert('password changed!');
         }
@@ -128,7 +131,7 @@ define(['./backtofront'], function(backtofront) {
       //a password reset session is somehow special in that it doesn't require retyping your current password:
       customer.completeForgotPassword(sessionStorage.resetPwd, $('password_reset').value, function(err, sessionKey) {
         if(err) {
-          alert(err);
+          showError('completeForgotPassword error', err);
         } else {
           showDashboard(sessionKey);
           alert('Password reset. Now remember it, ok? ;)');
@@ -139,7 +142,7 @@ define(['./backtofront'], function(backtofront) {
     deleteAccount: function() {
       customer.deleteAccount(sessionStorage.sessionKey, $('currentPwd').value, function(err) {
         if(err) {
-          alert(err);
+          showError('deleteAccount error', err);
         } else {
           logout();
           console.log('Sad to see you go. Have a nice life. Over and out!');
@@ -148,9 +151,9 @@ define(['./backtofront'], function(backtofront) {
     },
 
     logout: function() {
-      showPage('first');
       delete localStorage.sessionKey;
       delete sessionStorage.sessionKey;
+      document.location = document.location;
     },
 
     jump: function(path) {
@@ -192,7 +195,9 @@ define(['./backtofront'], function(backtofront) {
         customer.completeVerifyEmail(parts[1], function(err, sessionKey) {
           if(err) {
             showPage('first');
-            alert(err);
+            if(err) {
+              showError('completeVerifyEmail error', err);
+            }
           } else {
             showDashboard(sessionKey);
             alert('email address verified, thank you!');
@@ -204,8 +209,7 @@ define(['./backtofront'], function(backtofront) {
       } else if(parts[0]=='email_change') {
         customer.completeChangeEmail(parts[1], function(err, sessionKey) {
           if(err) {
-            showPage('first');
-            alert(err);
+            showError('completeChangeEmail error', err);
           } else {
             showDashboard(sessionKey);
             alert('email address changed!');
@@ -231,7 +235,7 @@ define(['./backtofront'], function(backtofront) {
       var params = JSON.parse($('ask-params').value);
       customer.getBearerToken(sessionStorage.sessionKey, params.origin, params.scope, function(err, token) {
         if(err) {
-          alert(err);
+          showError('getBearerTokne failed', err);
         } else {
           window.location = params.redirect_uri+'#access_token='+token;
         }
@@ -240,7 +244,7 @@ define(['./backtofront'], function(backtofront) {
     revoke: function(origin, token) {
       customer.revokeBearerToken(sessionStorage.sessionKey, origin, token, function(err) {
         if(err) {
-          alert(err);
+          showError('revokeBearerTokne failed', err);
         } else {
           showMessage('revoked!');
           client.auth.list();
@@ -251,7 +255,7 @@ define(['./backtofront'], function(backtofront) {
       showPage('auth');
       customer.listBearerTokens(sessionStorage.sessionKey, function(err, rows) {
         if(err) {
-          alert(err);
+          showError('listBearerTokens failed', err);
         } else {
           var str = '';
           for(var i=0; i<rows.length; i++) {
