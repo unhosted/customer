@@ -8,24 +8,21 @@ var captcha = require('../captcha'),
   config = require('../config').config;
 
 exports.requestCaptcha = function(cb) {
-  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
+  if(typeof(cb) !== 'function') { throw new Error("Invalid callback!"); }
   captcha.get(cb);
 };
 
 function validEmail(str) {
-  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   return typeof(str)=='string' && str.match(/^([a-z0-9\.\_\+\%\-]+@[a-z0-9\.\-]+\.[a-z]+)$/g);
                                                //  (chars)           @ (chars)      .(letters)
 }
 
 function validPassword(str) {
-  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   return typeof(str)=='string' && str.length > 5;
   //any string of length >= 5
 }
 
 function validHost(str) {
-  if(typeof(cb) !== 'function') { throw "Invalid callback!"; }
   return typeof(str)=='string' && str.match(/^([a-z0-9][a-z0-9\-]*[a-z0-9])$/g);
                                              // (one lc) (lc or -)  (one lc)
 }
