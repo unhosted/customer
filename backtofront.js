@@ -66,7 +66,7 @@ if(typeof(window) != 'undefined') {//client
     function send(module, method, args) {
       for(var i=0; i<args.length; i++) {
         if(typeof(args[i])=='function') {
-          id = new Date().getTime()+'-'+running.length;
+          id = new Date().getTime()+'-'+Object.keys(running).length;
           running[id] = args[i];
           args[i]='_function_'+id;
         } else if (typeof(args[i])=='string') {
