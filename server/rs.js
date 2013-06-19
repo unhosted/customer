@@ -43,6 +43,7 @@ function createSystemUser(uid, username, cb) {
                 });
             } else {
               cb("mkdir exited with status: " + mkdircode);
+            }
           });
       } else {
         cb("adduser exited with status: " + code);
