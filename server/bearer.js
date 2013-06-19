@@ -49,6 +49,7 @@ exports.revoke = function(uid, origin, token, cb) {
   }
   console.log('revoking bearer token for '+uid+', '+origin+', '+token);
   connection.query('DELETE FROM `rstokens` WHERE `uid` = ? AND `origin` = ? AND `token` = ?', [uid, origin, token], function(err) {
+    console.log('(bearer.revoke) DELETE returned: ', arguments);
     if(err) cb(err);
     else { exec('rs-remove-token', ['rs'+uid, token]); cb(); }
   });
