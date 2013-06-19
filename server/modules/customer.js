@@ -216,12 +216,12 @@ exports.getBearerToken = function(sessionKey, origin, scope, cb) {
   });
 }
 
-exports.revokeBearerToken = function(sessionKey, origin, cb) {
+exports.revokeBearerToken = function(sessionKey, origin, token, cb) {
   session.getUid(sessionKey, function(err, uid) {
     if(err) {
       cb(err);
     } else {
-      bearer.revoke(uid, origin, cb);
+      bearer.revoke(uid, origin, token, cb);
     }
   });
 }
