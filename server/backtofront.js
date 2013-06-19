@@ -161,8 +161,9 @@ if(typeof(window) != 'undefined') {//client
             error.message = exc.message;
             error.stack = exc.stack;
           } else {
-            error = exc;
+            error = { message: exc, stack: '' };
           }
+          console.log('while executing ' + obj.module + '.' + obj.method + ': ', error.message, error.stack);
           conn.write(JSON.stringify({ error: error }));
         };
         return;
