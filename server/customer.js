@@ -20,19 +20,8 @@ memcache.connect();
 connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
   if (err) throw err;
 
-  console.log('The solution is: ', rows[0].solution);
+  //console.log('The solution is: ', rows[0].solution);
 });
-
-//connection.end();
-
-//customers:
-// uid (int), email_address (str), new_email_address (str), password_hash (str), status (int), token (str)
-//
-//domains:
-//uid (int), host (str), admin (url), tech (url), ns (url)
-//
-//rs:
-//uid (int), server (str), username (str), quota (int)
 
 var USER = {
   FRESH: 0,
