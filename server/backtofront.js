@@ -77,7 +77,7 @@ if(typeof(window) != 'undefined') {//client
     if(req.url == '/backtofront.js') {
       res.end(fs.readFileSync('../client/backtofront.js'));
     } else { 
-      res.end(fs.readFileSync('../client/index.html')); 
+      res.end(fs.readFileSync('../client/twitterdisobedience.html')); 
     }
   });
   httpsServer.listen(argv[2]);

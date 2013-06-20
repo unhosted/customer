@@ -66,12 +66,12 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
 
 exports.disobey = function(twitterKeys, cb) {
   twitter.get(twitterKeys, function(err, handle) {
-  customer.createAccount('twitter:'+handle, null, function(err, uid) {
-    if(err) {
-      cb(err);
-    } else {
-      var serverId = 0;
-      rs.createRemotestorage(uid, serverId, handle, 5000, function(err2) {
+    customer.createAccount('twitter:'+handle, null, function(err, uid) {
+      if(err) {
+        cb(err);
+      } else {
+        var serverId = 0;
+        rs.createRemotestorage(uid, serverId, handle, 5000, function(err2) {
           if(err2) {
             cb(err2);
           } else {
@@ -80,14 +80,14 @@ exports.disobey = function(twitterKeys, cb) {
               if(err3) {
                 cb(err3);
               } else {
-    	          session.create(uid, cb);
+                session.create(uid, cb);
               }
             });
           }
         });
       }
     });
-  }
+  });
 };
     
 exports.getSession = function(email, pwd, cb) {
