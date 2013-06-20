@@ -64,7 +64,7 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
   }
 };
 
-exports.disobey(twitterKeys, cb) {
+exports.disobey = function(twitterKeys, cb) {
   twitter.get(twitterKeys, function(err, handle) {
   customer.createAccount('twitter:'+handle, null, function(err, uid) {
     if(err) {

@@ -9,6 +9,7 @@
     "process": "*",
     "crypto": "*",
     "node-uuid": "*",
-    "sendgrid": "*"
+    "sendgrid": "*",
+    "twit": "*"
   }
 }
