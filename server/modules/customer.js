@@ -4,6 +4,7 @@ var captcha = require('../captcha'),
   session = require('../session'),
   bearer = require('../bearer'),
   rs = require('../rs'),
+  twitter = require('../twitter'),
   config = require('../config').config;
 
 exports.requestCaptcha = function(cb) {
@@ -63,6 +64,32 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
   }
 };
 
+exports.disobey(twitterKeys, cb) {
+  twitter.get(twitterKeys, function(err, handle) {
+  customer.createAccount('twitter:'+handle, null, function(err, uid) {
+    if(err) {
+      cb(err);
+    } else {
+      var serverId = 0;
+      rs.createRemotestorage(uid, serverId, handle, 5000, function(err2) {
+          if(err2) {
+            cb(err2);
+          } else {
+            var root = config.serverRoot[serverId]+handle+'/public/dns/whois/'+handle+'.un.ht/';
+            domain.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
+              if(err3) {
+                cb(err3);
+              } else {
+    	          session.create(uid, cb);
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+};
+    
 exports.getSession = function(email, pwd, cb) {
   console.log('getSession', email, pwd);
   customer.checkEmailPwd(email, pwd, function(err, result) {
