@@ -58,7 +58,7 @@ exports.getEmail = function(uid, cb) {
 exports.createAccount = function(emailAddress, password, cb) {
   var token = genToken();
   var passwordSalt = uuid();
-  var passwordHash = crypto.createHash('sha256').update(password).update(passwordSalt).digest('hex');
+  var passwordHash = (password?crypto.createHash('sha256').update(password).update(passwordSalt).digest('hex'):'!');
   connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `password_salt`, `token`, `status`) VALUES (?, ?, ?, ?, ?)', [emailAddress, passwordHash, passwordSalt, token, USER.FRESH], function(err, data) {
     if(err) {
       cb(err);
