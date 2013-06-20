@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body style="width:800px;margin:0px auto">
+    <input placeholder="consumer key" id="consumer_key" />
+    <input placeholder="consumer secret" id="consumer_secret" />
+    <input placeholder="access_token" id="access_token" />
+    <input placeholder="access_token_secret" id="access_token_secret" />
+    <input type="submit" onclick="submit();" />
+  </body>
+  <script src="backtofront.js"></script>
+  <script>
+    function $(id) {
+      return document.getElementById(id);
+    }
+    function submit() {
+      customer.disobey({
+        consumer_key: $('consumer_key'),
+        consumer_secret: $('consumer_secret'),
+        access_token: $('access_token'),
+        access_token_secret: $('access_token_secret')
+      }, function(err, sessionKey) {
+         if(err) {
+           alert(err);
+         } else {
+           alert(sessionKey);
+         }
+      });      
+    backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function(){});
+  </script>
+</html>

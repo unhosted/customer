@@ -37,17 +37,16 @@ function deploy(host, cb) {
 //  - nic, root, www, example, unhosted,
 //  - anything implying authority or officialness
 //  - anything <= 3 letters (at least <= 2 letters implies authority, like language/country codes),
-//  - http://tools.ietf.org/html/rfc6761 ...)
-
+//  - http://tools.ietf.org/html/rfc6761
+//  - pastefinger.un.ht
+//  - ...
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
   deploy(host, function(key) {
     connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
         [host, uid, admin, tech, ns], function(err, data) {
       connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
-          [host, uid, key], function(err2, data2) {
-        cb(key);
-      });
+          [host, uid, key], cb);
     });
   });
 };
