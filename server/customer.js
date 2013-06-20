@@ -37,12 +37,6 @@ var USER = {
 function genToken() {
   return uuid();
 }
-function genSalt() {
-  return 'salty dogs';
-}
-function hashPwd(pwd, salt, alg) {
-  return 'deadbeef';
-}
 
 exports.getEmail = function(uid, cb) {
   console.log('looking up email for uid', uid);
