@@ -207,10 +207,10 @@ exports.deleteAccount = function(sessionKey, password, cb) {
 };
 
 exports.getStorageInfo = function(sessionKey, cb) {
-  return {
+  cb(null, {
     href: 'https://unht-beta.heahdk.net:1235/storage/rs10001',
     type: 'remotestorage-01'
-  };
+  });
 };
 
 exports.getBearerToken = function(sessionKey, origin, scope, cb) {

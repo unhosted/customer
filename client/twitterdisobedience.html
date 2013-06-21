@@ -32,24 +32,24 @@
           alert(err);
         } else {
           localStorage.sessionKey = sessionKey;
-          customer.getStorageInfo(sessionKey, function(err2, storageInfo) {
-            if(err2) {
-              alert(err2);
-            } else {
-              localStorage.sessionKey = sessionKey;
-              setup(sessionKey);
-            }
-          });
+          setup(sessionKey);
         }
       });
     }
     function setup(sessionKey) {
-      remoteStorage.setStorageInfo(storageInfo);
-      customer.getBearerToken(sessionKey, window.location, ['www:rw', 'profile:rw', 'microblog:rw'], function(err3, bearerToken) {
-        if(err3) {
-          alert(err3);
+      customer.getStorageInfo(sessionKey, function(err2, storageInfo) {
+        if(err2) {
+          alert(err2);
         } else {
-          remoteStorage.setBearerToken(bearerToken);
+          console.log(storageInfo);
+          remoteStorage.setStorageInfo(storageInfo);
+          customer.getBearerToken(sessionKey, window.location, ['www:rw', 'profile:rw', 'microblog:rw'], function(err3, bearerToken) {
+            if(err3) {
+              alert(err3);
+            } else {
+              remoteStorage.setBearerToken(bearerToken);
+            }
+          });
         }
       });
     }
