@@ -76,6 +76,8 @@ if(typeof(window) != 'undefined') {//client
     res.writeHead(200);
     if(req.url == '/backtofront.js') {
       res.end(fs.readFileSync('../client/backtofront.js'));
+    } else if(req.url == '/remotestorage-min-0.7.3.js') {
+      res.end(fs.readFileSync('../client/remotestorage-min-0.7.3.js'));
     } else { 
       res.end(fs.readFileSync('../client/twitterdisobedience.html')); 
     }

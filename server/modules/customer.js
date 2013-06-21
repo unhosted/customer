@@ -206,6 +206,13 @@ exports.deleteAccount = function(sessionKey, password, cb) {
   });
 };
 
+exports.getStorageInfo = function(sessionKey, cb) {
+  return {
+    href: 'https://unht-beta.heahdk.net:1235/storage/rs10001',
+    type: 'remotestorage-01'
+  };
+};
+
 exports.getBearerToken = function(sessionKey, origin, scope, cb) {
   session.getUid(sessionKey, function(err, uid) {
     if(err) {
@@ -214,7 +221,7 @@ exports.getBearerToken = function(sessionKey, origin, scope, cb) {
       bearer.get(uid, origin, scope, cb);
     }
   });
-}
+};
 
 exports.revokeBearerToken = function(sessionKey, origin, cb) {
   session.getUid(sessionKey, function(err, uid) {
@@ -224,7 +231,7 @@ exports.revokeBearerToken = function(sessionKey, origin, cb) {
       bearer.revoke(uid, origin, cb);
     }
   });
-}
+};
 
 exports.listBearerTokens = function(sessionKey, cb) {
   session.getUid(sessionKey, function(err, uid) {
@@ -234,4 +241,4 @@ exports.listBearerTokens = function(sessionKey, cb) {
       bearer.list(uid, cb);
     }
   });
-}
+};

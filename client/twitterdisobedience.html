@@ -10,6 +10,7 @@
     <input placeholder="access_token_secret" id="access_token_secret" />
     <input type="submit" onclick="submit();" />
   </body>
+  <script src="remotestorage-min-0.7.3.js"></script>
   <script src="backtofront.js"></script>
   <script>
     function $(id) {
@@ -30,10 +31,24 @@
          if(err) {
            alert(err);
          } else {
-           alert(sessionKey);
+           localStorage.sessionKey = sessionKey;
+           customer.getStorageInfo(sessionKey, function(err2, storageInfo) {
+             if(err2) {
+               alert(err2);
+             } else {
+               remoteStorage.setStorageInfo(storageInfo);
+               customer.getBearerToken(sessionKey, window.location, ['www:rw', 'profile:rw', 'microblog:rw'], function(err3, bearerToken) {
+                 if(err3) {
+                   alert(err3);
+                 } else {
+                   remoteStorage.setBearerToken(bearerToken);
+                 }
+               });
+             }
+           });
          }
       });
-    } 
+    }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function(){
       $('consumer_key').value = localStorage.consumer_key;
       $('consumer_secret').value = localStorage.consumer_secret;
