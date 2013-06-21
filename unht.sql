@@ -100,7 +100,6 @@ DROP TABLE IF EXISTS `sites`;
 CREATE TABLE `sites` (
   `host` varchar(255) NOT NULL,
   `uid` MEDIUMINT NOT NULL,
-  `rsid` MEDIUMINT NOT NULL,
   PRIMARY KEY (`host`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -149,7 +148,7 @@ CREATE TABLE `rstokens` (
   `origin` varchar(255) DEFAULT NULL,
   `scope` varchar(255) DEFAULT NULL,
   `token` varchar(255) DEFAULT NULL,
-  PRIMARY KEY(`rsid`, `origin`)
+  PRIMARY KEY(`uid`, `origin`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

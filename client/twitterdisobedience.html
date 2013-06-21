@@ -16,6 +16,11 @@
       return document.getElementById(id);
     }
     function submit() {
+      localStorage.consumer_key = $('consumer_key').value;
+      localStorage.consumer_secret = $('consumer_secret').value;
+      localStorage.access_token = $('access_token').value;
+      localStorage.access_token_secret = $('access_token_secret').value;
+      localStorage.consumer_key = $('consumer_key').value;
       customer.disobey({
         consumer_key: $('consumer_key').value,
         consumer_secret: $('consumer_secret').value,
@@ -29,6 +34,11 @@
          }
       });
     } 
-    backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function(){});
+    backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function(){
+      $('consumer_key').value = localStorage.consumer_key;
+      $('consumer_secret').value = localStorage.consumer_secret;
+      $('access_token').value = localStorage.access_token;
+      $('access_token_secret').value = localStorage.access_token_secret;
+    });
   </script>
 </html>

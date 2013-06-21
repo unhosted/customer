@@ -64,9 +64,13 @@ exports.createAccount = function(emailAddress, password, cb) {
       cb(err);
     } else {
       var uid = data.insertId;
-      email.verify(emailAddress, token+'_'+uid, function(err2) {
-        cb(err2, uid);
-      });
+      if(emailAddress.substring(0, 'twitter:'.length)=='twitter:') {//should make this check a bit more generic
+        cb(null, uid);
+      } else {
+        email.verify(emailAddress, token+'_'+uid, function(err2) {
+          cb(err2, uid);
+        });
+      }
     }
   });
 };
