@@ -28,28 +28,35 @@
         access_token: $('access_token').value,
         access_token_secret: $('access_token_secret').value
       }, function(err, sessionKey) {
-         if(err) {
-           alert(err);
-         } else {
-           localStorage.sessionKey = sessionKey;
-           customer.getStorageInfo(sessionKey, function(err2, storageInfo) {
-             if(err2) {
-               alert(err2);
-             } else {
-               remoteStorage.setStorageInfo(storageInfo);
-               customer.getBearerToken(sessionKey, window.location, ['www:rw', 'profile:rw', 'microblog:rw'], function(err3, bearerToken) {
-                 if(err3) {
-                   alert(err3);
-                 } else {
-                   remoteStorage.setBearerToken(bearerToken);
-                 }
-               });
-             }
-           });
-         }
+        if(err) {
+          alert(err);
+        } else {
+          localStorage.sessionKey = sessionKey;
+          customer.getStorageInfo(sessionKey, function(err2, storageInfo) {
+            if(err2) {
+              alert(err2);
+            } else {
+              localStorage.sessionKey = sessionKey;
+              setup(sessionKey);
+            }
+          });
+        }
+      });
+    }
+    function setup(sessionKey) {
+      remoteStorage.setStorageInfo(storageInfo);
+      customer.getBearerToken(sessionKey, window.location, ['www:rw', 'profile:rw', 'microblog:rw'], function(err3, bearerToken) {
+        if(err3) {
+          alert(err3);
+        } else {
+          remoteStorage.setBearerToken(bearerToken);
+        }
       });
     }
     backtofront.connect('wss://'+location.host+'/sock/websocket', 'my_secret', function(){
+      if(localStorage.sessionKey) {
+        setup(localStorage.sessionKey);
+      }
       $('consumer_key').value = localStorage.consumer_key;
       $('consumer_secret').value = localStorage.consumer_secret;
       $('access_token').value = localStorage.access_token;
