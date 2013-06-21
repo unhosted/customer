@@ -17,10 +17,10 @@ function genBearerToken() {
   return uuid();
 }
 
-exports.get = function(uid, origin, scope, cb) {
+exports.get = function(uid, origin, scopes, cb) {
   var bearerToken = genBearerToken();
   connection.query('INSERT INTO `rstokens` (`uid`, `origin`, `scope`, `token`) VALUES (?, ?, ?, ?)', 
-      [uid, origin, scope, bearerToken], function(err) {
+      [uid, origin, JSON.stringify(scope), bearerToken], function(err) {
     console.log('bearer token '+bearerToken+' created for uid '+uid);
     cb(err, bearerToken);
   });
