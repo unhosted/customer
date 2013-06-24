@@ -78,7 +78,7 @@ exports.disobey = function(twitterKeys, cb) {
             cb(err2);
           } else {
             var root = config.serverRoot[serverId]+handle+'/public/dns/whois/'+handle+'.un.ht/';
-            domain.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
+            domain.createDomain(handle, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
               if(err3) {
                 cb(err3);
               } else {

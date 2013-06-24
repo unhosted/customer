@@ -19,8 +19,8 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-function deploy(host, cb) {
-  var script = spawn(config.deploy, [host]),
+function deploy(host, uid, cb) {
+  var script = spawn(config.deploy, [host, uid]),
     str = '';
   script.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
@@ -42,7 +42,7 @@ function deploy(host, cb) {
 //  - ...
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
-  deploy(host, function(key) {
+  deploy(host, 10000+uid, function(key) {
     connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
         [host, uid, admin, tech, ns], function(err, data) {
       connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
