@@ -17,19 +17,26 @@ var connection = mysql.createConnection({
   database : config.db.database
 });
 
-connection.connect();
-
+connection.connect(function(e) {
+  console.log('caught', e);
+});
 function deploy(host, uid, cb) {
-  var script = spawn(config.deploy, [host, uid]),
-    str = '';
+  var script = spawn(config.deploy.domain, [host, uid]),
+    str = '',
+    failed = false;
   script.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
     str += data;
   });
-  script.stderr.on('data', function (data) { console.log('stderr: ' + data); });
+  script.stderr.on('data', function (data) {
+    if(data.toString().indexOf('failed') != -1) {
+      failed = data.toString();
+    }
+    console.log('stderr: ' + data);
+  });
   script.on('close', function (code) {
     console.log('child process exited with code ' + code);
-    cb(str);
+    cb((failed?failed:(code != 0)), str);
   });
 }
 
@@ -42,12 +49,24 @@ function deploy(host, uid, cb) {
 //  - ...
 
 exports.createDomain = function(host, uid, admin, tech, ns, cb) {
-  deploy(host, 10000+uid, function(key) {
-    connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
-        [host, uid, admin, tech, ns], function(err, data) {
-      connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
-          [host, uid, key], cb);
-    });
+  deploy(host, 10000+uid, cb);
+  return;
+  deploy(host, 10000+uid, function(err, key) {
+    console.log('deploy error:', err);
+    if(err) {
+      cb(err);
+    } else {
+      connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
+          [host, uid, admin, tech, ns], function(err2) {
+        console.log('insert error:', err2);
+        if(err2) {
+          cb(err2);
+        } else {
+          connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
+               [host, uid, key], cb);
+        }
+      });
+    }
   });
 };
 exports.updateDomain = function(host, uid, admin, tech, ns, cb) {

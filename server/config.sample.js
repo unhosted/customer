@@ -15,5 +15,7 @@ exports.config = {
   },
   captchaSolutionSalt: 'salt n peppa',
   serverRoot: ['https://storage.example.com/'],
-  deploy: '/usr/bin/deploy.sh'
+  deploy: {
+    domain: '/home/customer-backend/add_subdomain.sh'
+  }
 };
