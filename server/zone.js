@@ -21,7 +21,7 @@ connection.connect(function(e) {
   console.log('caught', e);
 });
 function deploy(host, uid, cb) {
-  var script = spawn(config.deploy.domain, [host, uid]),
+  var script = spawn(config.deploy.zone, [host, uid]),
     str = '',
     failed = false;
   script.stdout.on('data', function (data) {
@@ -56,8 +56,8 @@ exports.createDomain = function(host, uid, admin, tech, ns, cb) {
     if(err) {
       cb(err);
     } else {
-      connection.query('INSERT INTO `domains` (`host`, `uid`, `admin`, `tech`, `ns`) VALUES (?, ?, ?, ?, ?)', 
-          [host, uid, admin, tech, ns], cb);
+      connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
+          [host, uid, key], cb);
     }
   });
 };
