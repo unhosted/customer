@@ -1,6 +1,8 @@
 var captcha = require('../captcha'),
   customer = require('../customer'),
   domain = require('../domain'),
+  zone = require('zone'),
+  site = require('site'),
   session = require('../session'),
   bearer = require('../bearer'),
   rs = require('../rs'),
@@ -60,7 +62,13 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
                   if(err4) {
                     cb(err4);
                   } else {
-        	          session.create(uid, cb);
+                    site.setUpSite(host, uid, function(err5) {
+                      if(err5) {
+                        cb(err5);
+                      } else {
+                        session.create(uid, cb);
+                      }
+                    });
                   }
                 });
               }
