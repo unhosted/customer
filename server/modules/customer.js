@@ -1,13 +1,18 @@
 var captcha = require('../captcha'),
   customer = require('../customer'),
   domain = require('../domain'),
-  zone = require('zone'),
-  site = require('site'),
+  zone = require('../zone'),
+  site = require('../site'),
   session = require('../session'),
   bearer = require('../bearer'),
   rs = require('../rs'),
   twitter = require('../twitter'),
   config = require('../config').config;
+
+exports.do = function(job, cb) {
+  console.log('customer.do', job);
+  cb(null, job);
+};
 
 exports.requestCaptcha = function(cb) {
   if(typeof(cb) !== 'function') { throw new Error("Invalid callback!"); }
