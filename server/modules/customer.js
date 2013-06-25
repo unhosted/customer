@@ -56,7 +56,13 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
               if(err3) {
                 cb(err3);
               } else {
-    	          session.create(uid, cb);
+                zone.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err4) {
+                  if(err4) {
+                    cb(err4);
+                  } else {
+        	          session.create(uid, cb);
+                  }
+                });
               }
             });
           }
