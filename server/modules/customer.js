@@ -9,9 +9,44 @@ var captcha = require('../captcha'),
   twitter = require('../twitter'),
   config = require('../config').config;
 
+// getAccount(twitterKeys, rsScope) -> sessionToken
+//   getDomain -> { domain: 'handle.un.ht' }
+//   getZone -> { root: 'handle.un.ht', server: 'ns.un.ht', key: '...' }
+//   getSite -> { ipaddress: '...', vhost: 'handle.un.ht', fileroot: '/home/...' }
+//   getStorage -> { bearerToken: '...', type: 'draft-dejong-remotestorage-01', href: '...' }
+//   
+
 exports.do = function(job, cb) {
   console.log('customer.do', job);
-  cb(null, job);
+/*  twitter.check(job.object.keys, function(err, handle) {
+    if(err) {
+      cb(err);
+    } else {  
+      customer.createAccount('twitter:'+handle, null, function(err2, uid) {
+        if(err2) {
+          cb(err2);
+        } else {
+          session.create(uid, function(err3, token) {
+            cb(err3, {sessionToken: token});
+          });
+          domain.create(uid, handle+'.un.ht', function(err4) {
+            cb(err4, {dnr: handle+'.un.ht'});
+          });
+          zone.create(uid, handle+'.un.ht', function(err4, editKey) {
+            cb(err4, {zoneEditKey: editKey});
+          });
+          storage.create(uid, function(err5, storageObj) {
+            cb(err5, {storage: storageObj});
+            if(!err5) {
+              site.create(uid, handle+'.un.ht', storageObj, function(err6, siteObj) {
+                cb(err6, {site: siteObj});
+              });
+            }
+          });
+        }
+      });
+    }
+  }); */
 };
 
 exports.requestCaptcha = function(cb) {
