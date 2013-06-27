@@ -1,27 +1,13 @@
-var mysql = require('mysql'),
+var connection = require('./db').connection,
   Memcache = require('memcache'),
   email = require('./email').email,
   uuid = require('node-uuid'),
   crypto = require('crypto'),
   config = require('./config').config;
 
-var connection = mysql.createConnection({
-  host     : config.db.host,
-  user     : config.db.user,
-  password : config.db.password,
-  database : config.db.database
-});
-
-connection.connect();
-
 var memcache = new Memcache.Client(config.memcache.port, config.memcache.host);
 memcache.connect();
 
-connection.query('SELECT 6 * 7 AS solution', function(err, rows, fields) {
-  if (err) throw err;
-
-  //console.log('The solution is: ', rows[0].solution);
-});
 
 var USER = {
   FRESH: 0,

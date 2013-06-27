@@ -9,37 +9,38 @@ var captcha = require('../captcha'),
   twitter = require('../twitter'),
   config = require('../config').config;
 
-// getAccount(twitterKeys, rsScope) -> sessionToken
-//   getDomain -> { domain: 'handle.un.ht' }
-//   getZone -> { root: 'handle.un.ht', server: 'ns.un.ht', key: '...' }
-//   getSite -> { ipaddress: '...', vhost: 'handle.un.ht', fileroot: '/home/...' }
-//   getStorage -> { bearerToken: '...', type: 'draft-dejong-remotestorage-01', href: '...' }
-//   
-
 exports.do = function(job, cb) {
   console.log('customer.do', job);
   twitter.check(job.object.keys, function(err, handle) {
     if(err) {
       cb(err);
     } else {  
+      console.log('customer.do twitter check', handle);
       customer.createAccount('twitter:'+handle, null, function(err2, uid) {
         if(err2) {
           cb(err2);
         } else {
+          console.log('customer.do user created', uid);
           session.create(uid, function(err3, token) {
+            console.log('customer.do session created', token);
             cb(err3, {sessionToken: token});
           });
-          var root = config.serverRoot[serverId]+host+'/public/dns/whois/'+host+'.un.ht/';
+          var serverId = 0;
+          var root = config.serverRoot[serverId]+handle+'/public/dns/whois/'+handle+'.un.ht/';
           domain.create(uid, handle+'.un.ht', root+'admin/', root+'tech/', root+'ns/', function(err4) {
+            console.log('customer.do domain created');
             cb(err4, {dnr: handle+'.un.ht'});
           });
           zone.create(uid, handle+'.un.ht', function(err4, editKey) {
+            console.log('customer.do zone created', editKey);
             cb(err4, {zoneEditKey: editKey});
           });
           storage.create(uid, function(err5, storageObj) {
             cb(err5, {storage: storageObj});
             if(!err5) {
+              console.log('customer.do storage created', storageObj);
               site.create(uid, handle+'.un.ht', storageObj, function(err6, siteObj) {
+                console.log('customer.do site created', siteObj);
                 cb(err6, {site: siteObj});
               });
             }
@@ -47,7 +48,7 @@ exports.do = function(job, cb) {
         }
       });
     }
-  }); */
+  });
 };
 
 exports.requestCaptcha = function(cb) {

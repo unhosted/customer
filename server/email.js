@@ -3,7 +3,7 @@ var APP_URL = 'https://unht-customer-beta.5apps.com/';
 
 var SendGrid = require('sendgrid').SendGrid,
   config = require('./config').config,
-  sendgrid = new SendGrid(config.sendgrid.user, config.sendgrid.password),
+  sendgrid = new SendGrid((config && config.sendgrid?config.sendgrid.user:''), (config&&config.sendgrid?config.sendgrid.password:'')),
   templates = {
     verify: ['Your unhosted account is almost ready!', 'Please visit '+APP_URL+'#verify:'],
     changeFrom: ['Someone changed your email address!', 'If this wasn\'t you then please contact support!'],

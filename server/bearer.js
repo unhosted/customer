@@ -1,18 +1,9 @@
-var mysql = require('mysql'),
+var connection = require('./db').connection,
   Memcache = require('memcache'),
   email = require('./email').email,
   uuid = require('node-uuid'),
   spawn = require('child_process').spawn,
   config = require('./config').config;
-
-var connection = mysql.createConnection({
-  host     : config.db.host,
-  user     : config.db.user,
-  password : config.db.password,
-  database : config.db.database
-});
-
-connection.connect();
 
 function genBearerToken() {
   return uuid();
