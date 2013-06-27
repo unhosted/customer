@@ -5,7 +5,7 @@ var captcha = require('../captcha'),
   site = require('../site'),
   session = require('../session'),
   bearer = require('../bearer'),
-  rs = require('../rs'),
+  storage = require('../rs'),
   twitter = require('../twitter'),
   config = require('../config').config;
 

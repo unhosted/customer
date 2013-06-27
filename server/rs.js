@@ -41,7 +41,9 @@ function createSystemUser(uid, username, cb) {
     });
 }
 
-exports.createRemotestorage = function(uid, server, username, quota, cb) {
+exports.create = function(uid, cb) {
+  var server = 0, quota = 5000;
+  var username = 'rs'+(MIN_UID + uid).toString();
   connection.query('INSERT INTO `remotestorage` (`uid`, `server`, `username`, `quota`)'
       +' VALUES (?, ?, ?, ?)', [uid, server, username, quota], function(err, data) {
     if(err) {
