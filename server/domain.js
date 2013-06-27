@@ -1,4 +1,4 @@
-var mysql = require('mysql'),
+var connection = require('./db').connection,
   memcache = require('memcache'),
   email = require('./email').email,
   spawn = require('child_process').spawn,
@@ -10,16 +10,6 @@ var DOMAIN = {
   EXPIRED: 2
 };
 
-var connection = mysql.createConnection({
-  host     : config.db.host,
-  user     : config.db.user,
-  password : config.db.password,
-  database : config.db.database
-});
-
-connection.connect(function(e) {
-  console.log('caught', e);
-});
 function deploy(host, uid, cb) {
   var script = spawn(config.deploy.domain, [host, uid]),
     str = '',
@@ -48,7 +38,7 @@ function deploy(host, uid, cb) {
 //  - pastefinger.un.ht
 //  - ...
 
-exports.createDomain = function(host, uid, admin, tech, ns, cb) {
+exports.create = function(uid, host, admin, tech, ns, cb) {
   deploy(host, 10000+uid, cb);
   return;
   deploy(host, 10000+uid, function(err, key) {

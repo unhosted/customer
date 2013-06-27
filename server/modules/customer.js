@@ -9,36 +9,38 @@ var captcha = require('../captcha'),
   twitter = require('../twitter'),
   config = require('../config').config;
 
-// getAccount(twitterKeys, rsScope) -> sessionToken
-//   getDomain -> { domain: 'handle.un.ht' }
-//   getZone -> { root: 'handle.un.ht', server: 'ns.un.ht', key: '...' }
-//   getSite -> { ipaddress: '...', vhost: 'handle.un.ht', fileroot: '/home/...' }
-//   getStorage -> { bearerToken: '...', type: 'draft-dejong-remotestorage-01', href: '...' }
-//   
-
 exports.do = function(job, cb) {
   console.log('customer.do', job);
-/*  twitter.check(job.object.keys, function(err, handle) {
+  twitter.check(job.object.keys, function(err, handle) {
     if(err) {
       cb(err);
     } else {  
+      console.log('customer.do twitter check', handle);
       customer.createAccount('twitter:'+handle, null, function(err2, uid) {
         if(err2) {
           cb(err2);
         } else {
+          console.log('customer.do user created', uid);
           session.create(uid, function(err3, token) {
+            console.log('customer.do session created', token);
             cb(err3, {sessionToken: token});
           });
-          domain.create(uid, handle+'.un.ht', function(err4) {
+          var serverId = 0;
+          var root = config.serverRoot[serverId]+handle+'/public/dns/whois/'+handle+'.un.ht/';
+          domain.create(uid, handle+'.un.ht', root+'admin/', root+'tech/', root+'ns/', function(err4) {
+            console.log('customer.do domain created');
             cb(err4, {dnr: handle+'.un.ht'});
           });
           zone.create(uid, handle+'.un.ht', function(err4, editKey) {
+            console.log('customer.do zone created', editKey);
             cb(err4, {zoneEditKey: editKey});
           });
           storage.create(uid, function(err5, storageObj) {
             cb(err5, {storage: storageObj});
             if(!err5) {
+              console.log('customer.do storage created', storageObj);
               site.create(uid, handle+'.un.ht', storageObj, function(err6, siteObj) {
+                console.log('customer.do site created', siteObj);
                 cb(err6, {site: siteObj});
               });
             }
@@ -46,7 +48,7 @@ exports.do = function(job, cb) {
         }
       });
     }
-  }); */
+  });
 };
 
 exports.requestCaptcha = function(cb) {
@@ -94,15 +96,15 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
             cb(err2);
           } else {
             var root = config.serverRoot[serverId]+host+'/public/dns/whois/'+host+'.un.ht/';
-            domain.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
+            domain.create(uid, host, root+'admin/', root+'tech/', root+'ns/', function(err3) {
               if(err3) {
                 cb(err3);
               } else {
-                zone.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err4) {
+                zone.create(uid, host, function(err4, zoneEditKey) {
                   if(err4) {
                     cb(err4);
                   } else {
-                    site.setUpSite(host, uid, function(err5) {
+                    site.setUpSite(uid, host, function(err5) {
                       if(err5) {
                         cb(err5);
                       } else {

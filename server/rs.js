@@ -1,16 +1,6 @@
-var mysql = require('mysql'),
+var connection = require('./db').connection,
   config = require('./config').config,
   spawn = require('child_process').spawn;
-
-
-var connection = mysql.createConnection({
-  host     : config.db.host,
-  user     : config.db.user,
-  password : config.db.password,
-  database : config.db.database
-});
-
-connection.connect();
 
 var MIN_UID = 10000;
 
