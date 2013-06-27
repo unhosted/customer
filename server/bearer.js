@@ -36,7 +36,7 @@ exports.get = function(uid, origin, scope, cb) {
   if(typeof(scope) !== 'string') {
     cb("Expected 'scope' to be a string - got: " + typeof(scope));
   }
-  scope = scope.split(' ').sort().join(' ');
+  scope = scope.split(/\s+/).sort().filter(function(s) { return !! s.match(/^[^:]+:rw?$/); }).join(' ');
   // get existing token:
   connection.query(
     'SELECT * FROM rstokens WHERE uid = ? AND origin = ? AND scope = ?', [uid, origin, scope], function(err, selectResults) {
