@@ -18,7 +18,7 @@ var captcha = require('../captcha'),
 
 exports.do = function(job, cb) {
   console.log('customer.do', job);
-/*  twitter.check(job.object.keys, function(err, handle) {
+  twitter.check(job.object.keys, function(err, handle) {
     if(err) {
       cb(err);
     } else {  
@@ -29,7 +29,8 @@ exports.do = function(job, cb) {
           session.create(uid, function(err3, token) {
             cb(err3, {sessionToken: token});
           });
-          domain.create(uid, handle+'.un.ht', function(err4) {
+          var root = config.serverRoot[serverId]+host+'/public/dns/whois/'+host+'.un.ht/';
+          domain.create(uid, handle+'.un.ht', root+'admin/', root+'tech/', root+'ns/', function(err4) {
             cb(err4, {dnr: handle+'.un.ht'});
           });
           zone.create(uid, handle+'.un.ht', function(err4, editKey) {
@@ -94,15 +95,15 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
             cb(err2);
           } else {
             var root = config.serverRoot[serverId]+host+'/public/dns/whois/'+host+'.un.ht/';
-            domain.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err3) {
+            domain.create(uid, host, root+'admin/', root+'tech/', root+'ns/', function(err3) {
               if(err3) {
                 cb(err3);
               } else {
-                zone.createDomain(host, uid, root+'admin/', root+'tech/', root+'ns/', function(err4) {
+                zone.create(uid, host, function(err4, zoneEditKey) {
                   if(err4) {
                     cb(err4);
                   } else {
-                    site.setUpSite(host, uid, function(err5) {
+                    site.setUpSite(uid, host, function(err5) {
                       if(err5) {
                         cb(err5);
                       } else {

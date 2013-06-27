@@ -48,7 +48,7 @@ function deploy(host, uid, cb) {
 //  - pastefinger.un.ht
 //  - ...
 
-exports.createDomain = function(host, uid, admin, tech, ns, cb) {
+exports.create = function(uid, host, cb) {
   deploy(host, 10000+uid, cb);
   return;
   deploy(host, 10000+uid, function(err, key) {

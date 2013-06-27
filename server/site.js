@@ -1,4 +1,10 @@
 var fs = require('fs');
-exports.setUpSite = function(host, user, cb) {
-  fs.symlink('/home/customer-backend/webserver/www/'+host+'.un.ht', '/home/'+user, cb);
-} 
+exports.setUpSite = function(uid, host, storageObj, cb) {
+  fs.symlink('/home/customer-backend/webserver/www/'+host, storageObj.filePath, function(err) {
+    cb(err, {
+      product: 'site',
+      ipaddress: '123.123.123.123',
+      vhost: host
+    });
+  });
+}
