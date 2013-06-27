@@ -33,14 +33,19 @@ function exec(scriptName, args, cb) {
 }
 
 exports.get = function(uid, origin, scope, cb) {
-  var bearerToken = genBearerToken();
+  if(typeof(scope) !== 'string') {
+    cb("Expected 'scope' to be a string - got: " + typeof(scope));
+  }
+  scope = scope.split(' ').sort().join(' ');
   // get existing token:
   connection.query(
-    'SELECT * FROM rstokens WHERE uid = ? AND origin = ? AND scope = ?', [uid, origin, scope], function(err, selectResult) {
+    'SELECT * FROM rstokens WHERE uid = ? AND origin = ? AND scope = ?', [uid, origin, scope], function(err, selectResults) {
       if(err) return cb(err);
       if(selectResults.length > 0) {
         cb(undefined, selectResults[0].token);
       } else {
+	// generate new token:
+	var bearerToken = genBearerToken();
         connection.query(
           'SELECT username FROM remotestorage WHERE uid = ?', [uid],
           function(err, result) {
