@@ -45,7 +45,7 @@ exports.createAccount = function(emailAddress, password, cb, options) {
   var token = genToken();
   var passwordSalt = uuid();
   var passwordHash = (password?crypto.createHash('sha256').update(password).update(passwordSalt).digest('hex'):'!');
-  connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `password_salt`, `token`, `status`) VALUES (?, ?, ?, ?, ?)', [emailAddress, passwordHash, passwordSalt, token, USER.FRESH], function(err, data) {
+  connection.query('INSERT INTO `customers` (`email_address`, `password_hash`, `password_salt`, `token`, `status`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `status` = `status`', [emailAddress, passwordHash, passwordSalt, token, USER.FRESH], function(err, data) {
     if(err) {
       cb(err);
     } else {
