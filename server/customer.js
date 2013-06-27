@@ -55,7 +55,7 @@ exports.getEmail = function(uid, cb) {
   });
 }
 
-exports.createAccount = function(emailAddress, password, cb) {
+exports.createAccount = function(emailAddress, password, cb, options) {
   var token = genToken();
   var passwordSalt = uuid();
   var passwordHash = (password?crypto.createHash('sha256').update(password).update(passwordSalt).digest('hex'):'!');
@@ -67,9 +67,13 @@ exports.createAccount = function(emailAddress, password, cb) {
       if(emailAddress.substring(0, 'twitter:'.length)=='twitter:') {//should make this check a bit more generic
         cb(null, uid);
       } else {
-        email.verify(emailAddress, token+'_'+uid, function(err2) {
-          cb(err2, uid);
-        });
+        if(! (options && options.skipVerify)) {
+          email.verify(emailAddress, token+'_'+uid, function(err2) {
+            cb(err2, uid);
+          });
+        } else {
+          cb(null, uid);
+        }
       }
     }
   });
@@ -255,3 +259,7 @@ https://npmjs.org/package/memcache
 SendGrid
 domainconf -> see how to interface with ggrin
 */
+
+exports.listAccounts = function(cb) {
+  connection.query('SELECT * FROM `customers`', cb);
+};
