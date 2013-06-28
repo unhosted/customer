@@ -104,7 +104,7 @@ exports.requestAccount = function(agree, email, pwd, captchaToken, captchaSoluti
                   if(err4) {
                     cb(err4);
                   } else {
-                    site.setUpSite(uid, host, function(err5) {
+                    site.create(uid, host, function(err5) {
                       if(err5) {
                         cb(err5);
                       } else {

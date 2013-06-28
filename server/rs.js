@@ -52,7 +52,19 @@ exports.create = function(uid, cb) {
       console.log(server, username, quota, cb);
       console.log('insertId', connection.insertId);
       if(connection.insertId) {
-        createSystemUser(uid, username, cb);
+        createSystemUser(uid, username, function(err2) {
+          cb(err2, {
+            server: server,
+            filePath: '/home/'+username+'/storage',
+            quota: quota
+          });
+        });
+      } else {
+        cb(null, {
+          server: server,
+          filePath: '/home/'+username+'/storage',
+          quota: quota
+        });
       }
     }
   });
