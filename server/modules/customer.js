@@ -43,6 +43,14 @@ exports.do = function(job, cb) {
                 console.log('customer.do site created', siteObj);
                 cb(err6, {site: siteObj});
               });
+              var list = [];
+              for(var i in job.object.scope) {
+                list.push(i+':'+job.object.scope[i]);
+              }
+              bearer.get(uid, job.object.origin, list.join(' '), function(err7, bearerToken) {
+                console.log('customer.do bearer token created', err7, bearerToken);
+                cb(err7, {bearerToken: bearerToken});
+              });
             }
           });
         }
