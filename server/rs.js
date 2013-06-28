@@ -63,7 +63,7 @@ exports.create = function(uid, cb) {
         cb(null, {
           server: server,
           filePath: '/home/'+username+'/storage',
-          href: 'https://unht-beta.heahdk.net/'+username+'/',
+          href: 'https://unht-beta.heahdk.net/'+username,
           quota: quota
         });
       }
