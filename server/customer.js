@@ -41,6 +41,19 @@ exports.getEmail = function(uid, cb) {
   });
 }
 
+function verify(emailAddress, uid, options, cb) {
+  if(emailAddress.substring(0, 'twitter:'.length)=='twitter:') {//should make this check a bit more generic
+    cb(null, uid);
+  } else {
+    if(! (options && options.skipVerify)) {
+      email.verify(emailAddress, token+'_'+uid, function(err2) {
+        cb(err2, uid);
+      });
+    } else {
+      cb(null, uid);
+    }
+  }
+}
 exports.createAccount = function(emailAddress, password, cb, options) {
   var token = genToken();
   var passwordSalt = uuid();
@@ -50,16 +63,16 @@ exports.createAccount = function(emailAddress, password, cb, options) {
       cb(err);
     } else {
       var uid = data.insertId;
-      if(emailAddress.substring(0, 'twitter:'.length)=='twitter:') {//should make this check a bit more generic
-        cb(null, uid);
+      if(uid==0) {
+        connection.query('SELECT `uid` FROM `customers` WHERE `email_address` = ?', [emailAddress], function(err2, rows) {
+          if(err2) {
+            cb(err2);
+          } else {
+            verify(emailAddress, rows[0].uid, options, cb);
+          }
+        });
       } else {
-        if(! (options && options.skipVerify)) {
-          email.verify(emailAddress, token+'_'+uid, function(err2) {
-            cb(err2, uid);
-          });
-        } else {
-          cb(null, uid);
-        }
+        verify(emailAddress, uid, options, cb);
       }
     }
   });

@@ -39,15 +39,18 @@ function deploy(host, uid, cb) {
 //  - ...
 
 exports.create = function(uid, host, cb) {
-  deploy(host, 10000+uid, cb);
-  return;
   deploy(host, 10000+uid, function(err, key) {
     console.log('deploy error:', err);
+    if(err.indexOf('already exists') != -1) {
+      err = null;
+    }
     if(err) {
       cb(err);
     } else {
-      connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?)', 
-          [host, uid, key], cb);
+      connection.query('INSERT INTO `zones` (`host`, `uid`, `editkey`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `host`=`host`', 
+          [host, uid, key], function(err2) {
+        cb(err2, key);
+      });
     }
   });
 };
