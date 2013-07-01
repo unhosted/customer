@@ -1,7 +1,13 @@
 var Twit = require('twit');
 
 exports.check = function(keys, cb) {
-  var twit = new Twit(keys);
+  var twit;
+  try {
+    twit = new Twit(keys);
+  } catch(e) {
+    cb(e);
+    return;
+  }
   twit.get('statuses/user_timeline', function(err, tweets) {
     if(tweets && tweets.length >= 1) {
       cb(null, tweets[0].user.screen_name);
