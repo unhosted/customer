@@ -33,14 +33,18 @@ exports.get = function(uid, origin, scope, cb) {
     'SELECT * FROM rstokens WHERE uid = ? AND origin = ? AND scope = ?', [uid, origin, scope], function(err, selectResults) {
       if(err) return cb(err);
       if(selectResults.length > 0) {
-        cb(undefined, selectResults[0].token);
+        cb(null, selectResults[0].token);
       } else {
-	// generate new token:
-	var bearerToken = genBearerToken();
+        // generate new token:
+        var bearerToken = genBearerToken();
         connection.query(
           'SELECT username FROM remotestorage WHERE uid = ?', [uid],
           function(err, result) {
             if(err) return cb(err);
+            if(typeof(result) != 'object' || typeof(result[0]) != 'object' || typeof(result[0].username) != 'string') {
+              return cb('no username for that uid');
+            }
+            console.log('username for uid '+uid+' is '+result[0].username);
             connection.query('INSERT INTO `rstokens` (`uid`, `origin`, `scope`, `token`) VALUES (?, ?, ?, ?)', [uid, origin, scope, bearerToken], function(err) {
               var args = [result[0].username, bearerToken].concat(scope.split(' '));
               exec('rs-add-token', args);

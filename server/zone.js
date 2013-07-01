@@ -41,7 +41,7 @@ function deploy(host, uid, cb) {
 exports.create = function(uid, host, cb) {
   deploy(host, 10000+uid, function(err, key) {
     console.log('deploy error:', err);
-    if(err.indexOf('already exists') != -1) {
+    if(typeof(err)=='string' && err.indexOf('already exists') != -1) {
       err = null;
     }
     if(err) {
