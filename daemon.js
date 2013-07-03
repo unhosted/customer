@@ -28,7 +28,14 @@ function startThread(creds, path) {
       }
     });
   });
-  for(eventName in {user_event: true, connect: true, disconnect: true, limit: true, scrub_geo: true, delete: true, tweet: true}) {
+  userStream.on('tweet', function(obj) {
+    console.log('tweet', obj);
+    save(path+'/microblogging/twitter/'+obj.id, 'application/json', JSON.stringify({
+      created_at: obj.created_at,
+      text: obj.text
+    }));
+  });
+  for(eventName in {user_event: true, connect: true, disconnect: true, limit: true, scrub_geo: true, delete: true}) {
     (function(en) {
       console.log('setting up listener', en);
       userStream.on(eventName, function(obj) { console.log(en, obj); });
@@ -36,6 +43,30 @@ function startThread(creds, path) {
   }
   console.log('setting up stream');
 }
+
+function makePathsImpl(base, curr, todo, cb) {
+  console.log('makePathsImpl', base, curr, todo);
+  if(curr.length) {
+    base = base + curr.shift() + '/';
+    fs.mkdir(base, function(err) {
+      console.log(base, err);
+      if(err && err.code != 'EEXIST') {
+        cb(err);
+      } else {
+        makePathsImpl(base, curr, todo, cb);
+      }
+    });
+  } else if(todo.length) {
+    var next = todo.pop();
+    makePathsImpl('', next.split('/'), todo, cb);
+  } else {
+    cb(null);
+  }
+}
+function makePaths(paths, cb) {
+  makePathsImpl('', [], paths, cb);
+}
+
 function start(cb) {
   connection.query('SELECT `twitter_credentials`, `uid` FROM `customers`',
       [], function(err, rows) {
@@ -57,23 +88,13 @@ function start(cb) {
           } else if(rows.length != 1) {
             return cb('not one storage for this customer');
           } else {
-            fs.mkdir('/home/'+rows[0].username+'/storage', function(err3) {
-              if(err3 && err3.code != 'EEXIST') {
+            makePaths([
+                '/home/'+rows[0].username+'/storage/contacts/twitter',
+                '/home/'+rows[0].username+'/storage/microblogging/twitter'], function(err3) {
+              if(err3) {
                 cb(err3);
               } else {
-                fs.mkdir('/home/'+rows[0].username+'/storage/contacts', function(err4) {
-                  if(err4 && err4.code != 'EEXIST') {
-                    cb(err4);
-                  } else {
-                    fs.mkdir('/home/'+rows[0].username+'/storage/contacts/twitter', function(err5) {
-                      if(err5 && err5.code != 'EEXIST') {
-                        cb(err5);
-                      } else {
-                        startThread(creds, '/home/'+rows[0].username+'/storage');
-                      }
-                    });
-                  }
-                });
+                startThread(creds, '/home/'+rows[0].username+'/storage');
               }
             });
           }
