@@ -41,7 +41,7 @@ exports.getEmail = function(uid, cb) {
   });
 }
 
-function verify(emailAddress, uid, options, cb) {
+function verify(emailAddress, uid, token, options, cb) {
   if(emailAddress.substring(0, 'twitter:'.length)=='twitter:') {//should make this check a bit more generic
     cb(null, uid);
   } else {
@@ -68,11 +68,11 @@ exports.createAccount = function(emailAddress, password, cb, options) {
           if(err2) {
             cb(err2);
           } else {
-            verify(emailAddress, rows[0].uid, options, cb);
+            verify(emailAddress, rows[0].uid, token, options, cb);
           }
         });
       } else {
-        verify(emailAddress, uid, options, cb);
+        verify(emailAddress, uid, token, options, cb);
       }
     }
   });

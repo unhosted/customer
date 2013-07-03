@@ -26,7 +26,7 @@ function deploy(host, uid, cb) {
   });
   script.on('close', function (code) {
     console.log('child process exited with code ' + code);
-    cb((failed?failed:(code != 0)), str);
+    cb((failed?failed:(code == 0?null:code)), str);
   });
 }
 
